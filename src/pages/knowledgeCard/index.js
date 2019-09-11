@@ -68,7 +68,7 @@ class Home extends React.Component {
   }
 
   handleJumpDetail = (course, uri) => {
-    window.open(`/getCard?course=${course}&uri=${uri}`)
+    window.open(`/getCard?course=${course}&uri=${encodeURIComponent(uri)}`)
   }
 
   render() {

@@ -17,6 +17,9 @@ router.all('/', (req, res) => {
   if (url.indexOf('kCardSearch') > -1) {
     url = 'http://166.111.68.66:8077/linkInstance'
   }
+  if (url.indexOf('getInstGraph') > -1) {
+    url = 'http://166.111.7.170:28090/server/getInstGraph'
+  }
   const opt = {
     method: req.method,
     url,

@@ -18,7 +18,6 @@ export default {
     if (rSymbol) {
       window.GLOBAL.requestSymbols[rSymbol] = cancel
     }
-    console.log(params)
     return axios.post(optsUrl, params, {
       timeout: 1000 * 120,
       cancelToken: token,

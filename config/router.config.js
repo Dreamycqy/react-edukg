@@ -16,6 +16,10 @@ export default [
         component: './graph',
       },
       {
+        path: 'firstGraph',
+        component: './graph/firstGraph',
+      },
+      {
         path: 'knowledgeCard',
         component: './knowledgeCard',
       },

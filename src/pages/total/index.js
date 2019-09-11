@@ -1,18 +1,24 @@
 import React from 'react'
 import { Input, Button, Row, Col, Pagination, Spin, message, Table } from 'antd'
 import { connect } from 'dva'
+import _ from 'lodash'
 import { getUrlParams, changeUrlQuery } from '@/utils/common'
 import { search, getPermission, detailTable } from '@/services/edukg'
+import { graphData } from '@/utils/graphData'
 import Chart from '@/components/charts/graph'
 import Epub from '@/components/container/epubLink'
 import dictionary from '@/constants/dictionary'
 import backgroundImage from '@/assets/totalbg.jpg'
+import LinkList from './linkList'
 
 const columns = [{
   title: 'key',
   dataIndex: 'key',
   width: 100,
   align: 'right',
+  render: (text, record) => {
+    return <span style={{ fontSize: 12, color: record.key === '学科' ? '#0dafdf' : null }}>{record.key}</span>
+  },
 }, {
   title: 'none',
   width: 10,
@@ -20,6 +26,9 @@ const columns = [{
   title: 'value',
   dataIndex: 'value',
   align: 'left',
+  render: (text, record) => {
+    return <span style={{ fontSize: 12, color: record.key === '学科' ? '#0dafdf' : null }}>{record.value}</span>
+  },
 }]
 
 function mapStateToProps(state) {
@@ -46,8 +55,16 @@ class SearchPage extends React.Component {
         code: 0,
         data: [],
       },
-      chartData: {},
+      chartData: {
+        nodes: [],
+        links: [],
+      },
+      forcename: '',
       tableLoading: false,
+      linkData: {
+        doc: [],
+        video: [],
+      },
     }
   }
 
@@ -78,7 +95,11 @@ class SearchPage extends React.Component {
     await this.setState({ current: 1 })
     await this.search()
     await this.permission()
-    this.detail()
+    if (this.state.instances.code === 1) {
+      this.handleSubjectChange('all')
+    } else {
+      this.detail()
+    }
   }
 
   permission = async () => {
@@ -97,8 +118,16 @@ class SearchPage extends React.Component {
       token,
     })
     if (data) {
+      const params = graphData(data.graph, info.course)
       data.property.propety.unshift({ key: '学科', value: data.property.subject })
-      this.setState({ tableData: data.property.propety, chartData: data.graph.content })
+      this.setState({
+        tableData: data.property.propety,
+        forcename: params.forcename,
+        chartData: {
+          nodes: params.nodes,
+          links: params.links,
+        },
+      })
     }
     this.setState({ tableLoading: false })
   }
@@ -109,13 +138,24 @@ class SearchPage extends React.Component {
       message.info('请输入您要查询的内容！')
       return
     }
-    this.setState({ loading: true })
+    this.setState({ loading: true, tableLoading: true })
     const data = await search({
       searchKey,
       curPage: current,
       pageSize,
     })
     if (data.fullsearch) {
+      const doc = []
+      const video = []
+      data.links.results.forEach((e) => {
+        e.urilinks.forEach((i) => {
+          if (i.sourcetype === '文档') {
+            doc.push(i)
+          } else {
+            video.push(i)
+          }
+        })
+      })
       await this.setState({
         dataSource: data.fullsearch.data.pager.rows,
         current: data.fullsearch.data.pager.curPage,
@@ -123,6 +163,7 @@ class SearchPage extends React.Component {
         total: data.fullsearch.data.pager.totalCount,
         info: data.graphandproperties[0],
         instances: data.instanceList,
+        linkData: { doc, video },
       })
     } else {
       message.error('请求失败！')
@@ -196,7 +237,10 @@ class SearchPage extends React.Component {
         <span>
           {e.label}
           &nbsp;(
-          <a href="javascript:;">
+          <a
+            href="javascript:;"
+            onClick={() => this.handleSubjectChange('single', e)}
+          >
             {e.course}
           </a>
           )
@@ -213,7 +257,10 @@ class SearchPage extends React.Component {
       obj.same.forEach((e) => {
         same.push(
           <span>
-            <a href="javascript:;">
+            <a
+              href="javascript:;"
+              onClick={() => this.handleSubjectChange('single', e)}
+            >
               {e.course}
             </a>
             &nbsp;
@@ -221,7 +268,7 @@ class SearchPage extends React.Component {
         )
       })
       same.push(
-        <span><a href="javascript:;">全图</a></span>,
+        <span><a href="javascript:;" onClick={() => this.handleSubjectChange('all')}>全图</a></span>,
       )
       result.unshift(
         <div>
@@ -235,10 +282,72 @@ class SearchPage extends React.Component {
     return result
   }
 
+  customForeach = async (arr, callback) => {
+    const { length } = arr
+    const O = Object(arr)
+    let k = 0
+    while (k < length) {
+      if (k in O) {
+        const kValue = O[k]
+        await callback(kValue, k, O) // eslint-disable-line
+      }
+      k++
+    }
+  }
+
+  handleSubjectChange = async (type, e) => {
+    this.setState({ tableLoading: true })
+    await this.permission()
+    if (type === 'single') {
+      await this.setState({ info: { course: e.course, uri: e.uri } })
+      this.detail()
+    } else {
+      const { instances } = this.state
+      const tableData = []
+      const forcename = ''
+      const nodes = []
+      const links = []
+      await this.customForeach(instances.same, async (item) => {
+        const data = await detailTable({
+          uri: item.uri,
+          subject: item.course,
+          token: this.state.token,
+        })
+        if (data) {
+          const params = graphData(data.graph, item.course)
+          const start = _.findIndex(nodes, { category: '0' })
+          if (start > -1) {
+            nodes.splice(start, 1)
+          }
+          params.nodes.forEach((a) => {
+            nodes.push(a)
+          })
+          params.links.forEach((b) => {
+            links.push(b)
+          })
+          data.property.propety.unshift({ key: '学科', value: data.property.subject })
+          data.property.propety.forEach((c) => {
+            tableData.push(c)
+          })
+        }
+      })
+      console.log(tableData)
+      this.setState({
+        tableData,
+        forcename,
+        chartData: {
+          nodes,
+          links,
+        },
+      })
+    }
+    this.setState({ tableLoading: false })
+  }
+
   render() {
     const {
       searchKey, dataSource, total, current, pageSize, loading,
-      tableData, instances, chartData, tableLoading,
+      tableData, instances, chartData, tableLoading, forcename, linkData,
     } = this.state
     const { locale } = this.props
     return (
@@ -309,9 +418,11 @@ class SearchPage extends React.Component {
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;知识图谱
               </div>
-              <div style={{ width: 536, height: 358 }}>
-                <Chart series={chartData} />
-              </div>
+              <Spin spinning={tableLoading}>
+                <div style={{ width: 536, height: 358 }}>
+                  <Chart graph={chartData} forcename={forcename} />
+                </div>
+              </Spin>
               <div style={{
                 fontWeight: 400, fontSize: 12, color: 'black', marginLeft: 24,
               }}
@@ -328,14 +439,14 @@ class SearchPage extends React.Component {
               </div>
               <Table
                 dataSource={tableData} columns={columns}
-                style={{ fontSize: 12, marginLeft: 12 }}
+                style={{ marginLeft: 12 }}
                 size="small" showHeader={false}
                 pagination={false} bordered
                 loading={tableLoading}
                 locale={{
                   emptyText: '没有信息',
                 }}
-                rowKeys={record => record.key + record.value}
+                rowKey={record => record.key + record.value}
               />
               <div style={{ color: '#1e95c3', fontWeight: 'bold', marginBottom: 20 }}>
                 <div
@@ -345,10 +456,9 @@ class SearchPage extends React.Component {
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;资源链接
               </div>
-              <div style={{ height: 40, marginLeft: 24 }}>
-                <Button style={{ float: 'left', marginRight: 20 }} type="primary">文档</Button>
-                <Button style={{ float: 'left' }} type="primary">视频</Button>
-              </div>
+              <Spin spinning={loading}>
+                <LinkList data={linkData} />
+              </Spin>
             </div>
           </Col>
         </Row>

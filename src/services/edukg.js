@@ -73,3 +73,27 @@ export function callBack(body, rSymbol) {
     rSymbol,
   })
 }
+
+export function querygraph(body, rSymbol) {
+  return request.post({
+    url: '/edukg/api/querygraph',
+    data: qs.stringify(body),
+    rSymbol,
+  })
+}
+
+export function queryByUri(body, rSymbol) {
+  return request.post({
+    url: '/edukg/api/queryByUri',
+    data: qs.stringify(body),
+    rSymbol,
+  })
+}
+
+export function getInstGraph(body, rSymbol) {
+  return request.get({
+    url: '/edukg/api/getInstGraph',
+    data: body,
+    rSymbol,
+  })
+}

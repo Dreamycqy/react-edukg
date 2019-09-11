@@ -42,7 +42,7 @@ class Home extends React.Component {
     const { uri, course } = getUrlParams()
     this.setState({ loading: true })
     const data = await detailCard({
-      uri: uri + window.location.hash,
+      uri,
       course,
     })
     if (data) {
@@ -71,6 +71,7 @@ class Home extends React.Component {
           showHeader={false}
           pagination={false}
           bordered
+          rowKey={record => record.feature_key + record.feature_value}
         />
       </div>
     )

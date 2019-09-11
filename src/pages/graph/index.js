@@ -1,7 +1,5 @@
 import React from 'react'
-import {
-  Button, Input, Spin, Select,
-} from 'antd'
+import { Button, Input, Spin, Select } from 'antd'
 import Highlighter from 'react-highlight-words'
 import { connect } from 'dva'
 import { graphSearch } from '@/services/edukg'
@@ -19,7 +17,7 @@ function mapStateToProps(state) {
   }
 }
 @connect(mapStateToProps)
-class Home extends React.Component {
+class GraphList extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -49,7 +47,7 @@ class Home extends React.Component {
   }
 
   handleJumpChart = (uri) => {
-    const url = `http://edukg.org/firstGraph?uri=${uri}&subject=${this.state.lastSubject}`
+    const url = `/firstGraph?uri=${encodeURIComponent(uri)}&subject=${this.state.lastSubject}`
     window.open(url)
   }
 
@@ -147,4 +145,4 @@ class Home extends React.Component {
   }
 }
 
-export default Home
+export default GraphList

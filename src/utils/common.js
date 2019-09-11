@@ -25,3 +25,32 @@ export const makeOption = (array) => {
   }
   return children
 }
+
+export const isInArray = (arr, value) => {
+  for (let i = 0; i < arr.length; i++) {
+    if (value === arr[i]) {
+      return true
+    }
+  }
+  return false
+}
+
+// 找出重名不重学科的节点
+export const theSameLabel = (other) => {
+  const samelabel = []
+  for (let h = 0; h < other.length; h++) {
+    const each = other[h]
+    const lab = each.label
+    const cor = each.course
+    for (let g = 0; g < other.length; g++) {
+      const obj = other[g]
+      const { label } = obj
+      const { course } = obj
+
+      if (label === lab && cor !== course) {
+        samelabel.push(each)
+      }
+    }
+  }
+  return samelabel
+}
