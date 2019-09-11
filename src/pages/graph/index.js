@@ -86,6 +86,7 @@ class Home extends React.Component {
     const {
       searchKey, loading, dataSource, subject,
     } = this.state
+    const { locale } = this.props
     return (
       <div style={{ textAlign: 'center' }}>
         <div style={{ display: 'inline-block', marginTop: 60, marginLeft: -30 }}>
@@ -93,7 +94,7 @@ class Home extends React.Component {
             <img src={Logo} alt="logo" width="84px" height="84px" />
           </div>
           <div style={{ float: 'left', fontSize: 42, marginTop: 16 }}>
-            {dictionary.graphTitle[this.props.locale]}
+            {dictionary.graphTitle[locale]}
           </div>
         </div>
         <br />
@@ -105,14 +106,14 @@ class Home extends React.Component {
               onChange={value => this.handleChangeType(value)}
               style={{ width: 120, marginTop: 14 }}
             >
-              {makeOption(subjectList[this.props.locale])}
+              {makeOption(subjectList[locale])}
             </Select>
             <Input
               size="large"
               value={searchKey}
               onChange={e => this.setState({ searchKey: e.target.value })}
               onPressEnter={() => this.handleSearch()}
-              placeholder={dictionary.placeholder[this.props.locale]}
+              placeholder={dictionary.placeholder[locale]}
               style={{
                 width: 500, marginTop: 14,
               }}
@@ -123,7 +124,7 @@ class Home extends React.Component {
               type="primary"
               onClick={() => this.handleSearch()}
             >
-              {dictionary.searchButton[this.props.locale]}
+              {dictionary.searchButton[locale]}
             </Button>
           </InputGroup>
         </div>
@@ -133,9 +134,9 @@ class Home extends React.Component {
           <Spin spinning={loading} size="large">
             <div style={{ textAlign: 'left' }}>
               <div style={{ marginBottom: 20 }}>
-                搜索结果：共搜到
+                {locale === 'cn' ? '搜索结果：共搜到' : 'Total: '}
                 {dataSource.length}
-                条数据
+                {locale === 'cn' ? '条数据' : ''}
               </div>
               {this.renderList(dataSource)}
             </div>

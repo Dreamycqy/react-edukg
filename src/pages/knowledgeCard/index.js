@@ -33,6 +33,7 @@ class Home extends React.Component {
   }
 
   searchKCard = async () => {
+    this.setState({ loading: true })
     if (this.state.searchKey.length === 0) {
       await this.setState({ searchKey: placeholder })
     }
@@ -48,6 +49,7 @@ class Home extends React.Component {
     if (data) {
       this.setState({ tags: data.results })
     }
+    this.setState({ loading: false })
   }
 
   handleTagging = (array) => {
@@ -100,7 +102,9 @@ class Home extends React.Component {
             style={{ width: '100%', marginTop: 10 }}
           />
           <div style={{ textAlign: 'right', width: '100%', marginTop: 10 }}>
-            <Button type="primary" onClick={() => this.searchKCard()} loading={loading}>提交</Button>
+            <Button type="primary" onClick={() => this.searchKCard()} loading={loading}>
+              {locale === 'cn' ? '提交' : 'Submit'}
+            </Button>
           </div>
           <div
             style={{

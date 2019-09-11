@@ -68,7 +68,7 @@ class SearchPage extends React.Component {
   showTotal = (total) => {
     const { current, pageSize } = this.state
     const target = current * pageSize
-    return `共计 ${total} 条结果，当前第${target - pageSize + 1} - ${target}`
+    return this.props.locale === 'cn' ? `共计 ${total} 条结果，当前第${target - pageSize + 1} - ${target}` : `Total: ${total}, now at ${target - pageSize + 1} - ${target}`
   }
 
   handleSearch = async () => {

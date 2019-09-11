@@ -4,6 +4,7 @@ import { connect } from 'dva'
 import router from 'umi/router'
 import Link from 'umi/link'
 import zh_CN from 'antd/lib/locale-provider/zh_CN'
+import en_GB from 'antd/lib/locale-provider/en_GB'
 import menuList from '@/constants/menuList'
 
 const {
@@ -50,7 +51,7 @@ class MainLayout extends React.Component {
   render() {
     return (
       <Layout>
-        <ConfigProvider locale={zh_CN}>
+        <ConfigProvider locale={this.props.locale === 'cn' ? zh_CN : en_GB}>
           <Header
             style={{
               height: 60,
