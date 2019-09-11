@@ -78,16 +78,24 @@ class MainLayout extends React.Component {
             </div>
             <div
               style={{
-                lineHeight: '58px', position: 'absolute', right: 30,
+                lineHeight: '58px', position: 'absolute', right: 80, cursor: 'pointer',
               }}
               onClick={() => this.handleLocaleChange()}
             >
               {this.props.locale === 'cn' ? 'EN' : '中文'}
             </div>
+            <div
+              style={{
+                lineHeight: '58px', position: 'absolute', right: 30, cursor: 'pointer',
+              }}
+              onClick={() => window.open('http://edukg.org/qa-api')}
+            >
+              APIs
+            </div>
             <Menu
               mode="horizontal"
               selectedKeys={[this.state.key]}
-              style={{ lineHeight: '58px', position: 'absolute', right: 100 }}
+              style={{ lineHeight: '58px', position: 'absolute', right: 140 }}
               onClick={e => this.handleSelect(e.key)}
             >
               {this.makeMenu()}
