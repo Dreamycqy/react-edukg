@@ -9,7 +9,11 @@ Frontend of Edukg (K12 Education Knowledge Graph) system build with React.
 
 需要安装node进程管理工具pm2: npm install -g pm2
 
+需要安装git: https://www.liaoxuefeng.com/wiki/896043488029600/896067074338496
+
 2.构建
+
+git clone https://github.com/Dreamycqy/react-edukg.git
 
 npm run build
 
