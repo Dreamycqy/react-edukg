@@ -1,0 +1,17 @@
+.teamCard {
+  float: left;
+  width: 270px;
+  height: 200px;
+  border-radius: 10px;
+  background-color: #efefef;
+  box-shadow: 0 0 10px rgba(0, 2, 2, .5);
+  margin: 10px 5%;
+  text-align: center;
+}
+.teamCard img {
+  vertical-align: middle;
+  height: 120px;
+  width: 120px;
+  border-radius: 50%;
+  margin-top: 10px;
+}
