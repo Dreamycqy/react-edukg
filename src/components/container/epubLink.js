@@ -11,7 +11,7 @@ export default class SearchPage extends React.Component {
 
   epubimg = (content) => {
     const { htmlId } = this.props
-    const postUrl = 'http://edukg.org/epubimg'
+    const postUrl = 'http://edukg.cn/epubimg'
     const ExportForm = document.createElement('FORM')
     ExportForm.id = 'form'
     ExportForm.style.display = 'none'

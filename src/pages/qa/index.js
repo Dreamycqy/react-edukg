@@ -60,7 +60,7 @@ class Home extends React.Component {
 
   handleJumpChart = (uri) => {
     const { lastSubject } = this.state
-    const url = `http://edukg.org/firstGraph?uri=${uri}&subject=${lastSubject}`
+    const url = `http://edukg.cn/firstGraph?uri=${uri}&subject=${lastSubject}`
     window.open(url)
   }
 

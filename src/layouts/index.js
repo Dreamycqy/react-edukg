@@ -88,7 +88,7 @@ class MainLayout extends React.Component {
               style={{
                 lineHeight: '58px', position: 'absolute', right: 30, cursor: 'pointer',
               }}
-              onClick={() => window.open('http://edukg.org/qa-api')}
+              onClick={() => window.open('http://edukg.cn/qa-api')}
             >
               APIs
             </div>
