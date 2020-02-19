@@ -8,6 +8,10 @@ export default [
         component: './index',
       },
       {
+        path: 'fy',
+        component: './fy',
+      },
+      {
         path: 'total',
         component: './total',
       },

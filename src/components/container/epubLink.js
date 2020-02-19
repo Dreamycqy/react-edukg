@@ -35,21 +35,23 @@ export default class SearchPage extends React.Component {
 
   renderList = (dataSource, show) => {
     const result = []
-    dataSource.forEach(
-      (e, index) => {
-        result.push(
-          <span key={e} style={{ display: (index < 3 || show) ? 'inline-block' : 'none' }}>
-            <a
-              href="javascript:;"
-              className={styles.aLink}
-              onClick={() => this.epubimg(e)}
-              dangerouslySetInnerHTML={{ __html: `${index + 1}.${e}` }} // eslint-disable-line
-            />
-            <br />
-          </span>,
-        )
-      },
-    )
+    if (dataSource) {
+      dataSource.forEach(
+        (e, index) => {
+          result.push(
+            <span key={e} style={{ display: (index < 3 || show) ? 'inline-block' : 'none' }}>
+              <a
+                href="javascript:;"
+                className={styles.aLink}
+                onClick={() => this.epubimg(e)}
+                dangerouslySetInnerHTML={{ __html: `${index + 1}.${e}` }} // eslint-disable-line
+              />
+              <br />
+            </span>,
+          )
+        },
+      )
+    }
     return result
   }
 
@@ -68,7 +70,7 @@ export default class SearchPage extends React.Component {
             onClick={() => this.setState({ show: !show })}
             style={{ color: '#b0b8b9' }}
           >
-            {show ? '<<收起结果' : `查看全部${list.length}个相关结果>>`}
+            {show ? '<<收起结果' : `查看全部${list ? list.length : 0}个相关结果>>`}
           </a>
         </div>
       </div>

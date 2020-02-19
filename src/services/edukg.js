@@ -97,3 +97,11 @@ export function getInstGraph(body, rSymbol) {
     rSymbol,
   })
 }
+
+export function fyTotal(body, rSymbol) {
+  return request.get({
+    url: '/edukg/api/fytotalsearch',
+    data: body,
+    rSymbol,
+  })
+}

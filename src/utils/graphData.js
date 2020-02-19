@@ -4,7 +4,7 @@ export const graphData = (data, course) => {
   const forcename = data.content.self.label
   nodes.push({
     category: '0',
-    name: data.content.self.label,
+    name: forcename,
     symbolSize: 60, // 节点大小
     uri: data.content.self.uri,
     course,
