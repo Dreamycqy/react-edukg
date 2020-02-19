@@ -2,8 +2,10 @@ import React from 'react'
 import { Input, Button } from 'antd'
 import router from 'umi/router'
 import { connect } from 'dva'
+import { routerRedux } from 'dva/router'
 import Hr from '@/components/items/hr'
 import dictionary from '@/constants/dictionary'
+import banner from '@/assets/banner.png'
 import styles from './index.css'
 
 const InputGroup = Input.Group
@@ -52,7 +54,7 @@ class Home extends React.Component {
                 onPressEnter={() => this.handleSearch()}
                 placeholder={dictionary.placeholder[locale]}
                 style={{
-                  width: 500,
+                  width: 540,
                 }}
               />
               <Button
@@ -64,6 +66,18 @@ class Home extends React.Component {
                 {dictionary.searchButton[locale]}
               </Button>
             </InputGroup>
+          </div>
+          <div
+            style={{ marginTop: 10, cursor: 'pointer' }}
+            onClick={() => {
+              this.props.dispatch(routerRedux.push({
+                pathname: '/fy',
+                query: {
+                },
+              }))
+            }}
+          >
+            <img alt="" src={banner} width="630px" height="42px" />
           </div>
         </div>
         <div className={styles.about}>

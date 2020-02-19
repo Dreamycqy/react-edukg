@@ -62,7 +62,7 @@ class SearchPage extends React.Component {
         links: [],
       },
       forcename: '',
-      tableLoading: true,
+      tableLoading: false,
       // linkData: {
       //   doc: [],
       //   video: [],
