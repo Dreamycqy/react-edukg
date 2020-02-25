@@ -196,27 +196,27 @@ class SearchPage extends React.Component {
                 <Epub htmlId={e.htmlId} list={e.content} />
                 <div style={{ fontSize: 12, color: '#b0b8b9' }}>
                   <span>
-                  应用学科：
+                    应用学科：
                     {e.subject}
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   </span>
                   <span>
-                  版本：
+                    版本：
                     {e.edition}
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   </span>
                   <span>
-                  适用年级：
+                    适用年级：
                     {e.grade}
-                  年级&nbsp;&nbsp;&nbsp;&nbsp;
+                    年级&nbsp;&nbsp;&nbsp;&nbsp;
                   </span>
                   <span>
-                  出版时间：
+                    出版时间：
                     {e.editionTime}
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   </span>
                   <span>
-                  ISBN：
+                    ISBN：
                     {e.isbn}
                   </span>
                 </div>
@@ -275,7 +275,7 @@ class SearchPage extends React.Component {
           {obj.same[0].label}
           &nbsp;(
           {same}
-)
+          )
         </div>,
       )
     }

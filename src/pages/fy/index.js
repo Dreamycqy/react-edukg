@@ -10,28 +10,27 @@ import dictionary from '@/constants/dictionary'
 import backgroundImage from '@/assets/totalbg.jpg'
 import styles from '@/components/container/local.css'
 import Banner from './banner'
+import LinkList from './linkList'
 
-// const columns = [{
-//   title: 'key',
-//   dataIndex: 'key',
-//   width: 100,
-//   align: 'right',
-//   render: (text, record) => {
-//     return <span style={{ fontSize: 12, color: record.key === '学科' ?
-// '#0dafdf' : null }}>{record.key}</span>
-//   },
-// }, {
-//   title: 'none',
-//   width: 10,
-// }, {
-//   title: 'value',
-//   dataIndex: 'value',
-//   align: 'left',
-//   render: (text, record) => {
-//     return <span style={{ fontSize: 12, color: record.key === '学科' ?
-// '#0dafdf' : null }}>{record.value}</span>
-//   },
-// }]
+const columns = [{
+  title: 'key',
+  dataIndex: 'key',
+  width: 100,
+  align: 'right',
+  render: (text, record) => {
+    return <span style={{ fontSize: 12, color: record.key === '学科' ? '#0dafdf' : null }}>{record.key}</span>
+  },
+}, {
+  title: 'none',
+  width: 10,
+}, {
+  title: 'value',
+  dataIndex: 'value',
+  align: 'left',
+  render: (text, record) => {
+    return <span style={{ fontSize: 12, color: record.key === '学科' ? '#0dafdf' : null }}>{record.value}</span>
+  },
+}]
 
 function mapStateToProps(state) {
   const { locale } = state.global
@@ -50,9 +49,9 @@ class SearchPage extends React.Component {
       pageSize: 5,
       total: 0,
       loading: false,
-      // tableData: [],
+      tableData: [],
       token: '',
-      // info: {},
+      info: {},
       instances: {
         code: 0,
         data: [],
@@ -63,10 +62,10 @@ class SearchPage extends React.Component {
       },
       forcename: '',
       tableLoading: false,
-      // linkData: {
-      //   doc: [],
-      //   video: [],
-      // },
+      linkData: {
+        doc: [],
+        video: [],
+      },
     }
   }
 
@@ -100,7 +99,7 @@ class SearchPage extends React.Component {
     if (this.state.instances.code === 1) {
       this.handleSubjectChange('all')
     } else {
-      // this.detail()
+      this.detail()
     }
   }
 
@@ -111,28 +110,28 @@ class SearchPage extends React.Component {
     }
   }
 
-  // detail = async () => {
-  //   const { token, info } = this.state
-  //   this.setState({ tableLoading: true })
-  //   const data = await detailTable({
-  //     uri: info.uri,
-  //     subject: info.course,
-  //     token,
-  //   })
-  //   if (data) {
-  //     const params = graphData(data.graph, info.course)
-  //     data.property.propety.unshift({ key: '学科', value: data.property.subject })
-  //     this.setState({
-  //       tableData: data.property.propety,
-  //       forcename: params.forcename,
-  //       chartData: {
-  //         nodes: params.nodes,
-  //         links: params.links,
-  //       },
-  //     })
-  //   }
-  //   this.setState({ tableLoading: false })
-  // }
+  detail = async () => {
+    const { token, info } = this.state
+    this.setState({ tableLoading: true })
+    const data = await detailTable({
+      uri: info.uri,
+      subject: info.course,
+      token,
+    })
+    if (data) {
+      const params = graphData(data.graph, info.course)
+      data.property.propety.unshift({ key: '学科', value: data.property.subject })
+      this.setState({
+        tableData: data.property.propety,
+        forcename: params.forcename,
+        chartData: {
+          nodes: params.nodes,
+          links: params.links,
+        },
+      })
+    }
+    this.setState({ tableLoading: false })
+  }
 
   search = async () => {
     const { searchKey, current, pageSize } = this.state
@@ -163,9 +162,9 @@ class SearchPage extends React.Component {
         current: data.fullsearch.data.pager.curPage,
         pageSize: data.fullsearch.data.pager.pageSize,
         total: data.fullsearch.data.pager.totalCount,
-        // info: data.graphandproperties[0] || { uri: '', course: '' },
+        info: data.graphandproperties[0] || { uri: '', course: '' },
         instances: data.instanceList,
-        // linkData: { doc, video },
+        linkData: { doc, video },
       })
     } else {
       message.error('请求失败！')
@@ -296,7 +295,7 @@ class SearchPage extends React.Component {
     await this.permission()
     if (type === 'single') {
       await this.setState({ info: { course: e.course, uri: e.uri } })
-      // this.detail()
+      this.detail()
     } else {
       const { instances } = this.state
       const tableData = []
@@ -329,7 +328,7 @@ class SearchPage extends React.Component {
       })
       console.log(tableData)
       this.setState({
-        // tableData,
+        tableData,
         forcename,
         chartData: {
           nodes,
@@ -343,7 +342,7 @@ class SearchPage extends React.Component {
   render() {
     const {
       searchKey, dataSource, total, current, pageSize, loading,
-      instances, chartData, tableLoading, forcename,
+      instances, chartData, tableLoading, forcename, tableData, linkData,
     } = this.state
     const { locale } = this.props
     return (
@@ -411,11 +410,10 @@ class SearchPage extends React.Component {
                   {this.renderInstance(instances)}
                 </div>
               </Spin>
-              {/* <div style={{ color: '#1e95c3', fontWeight: 'bold', marginBottom: 20 }}>
+              <div style={{ color: '#1e95c3', fontWeight: 'bold', marginBottom: 20 }}>
                 <div
                   style={{
-                    display: 'inline-block', width: 10, height: 20, backgroundColor: '#1e95c3',
-                    margin: '30px 0 -4px 0',
+                    display: 'inline-block', width: 10, height: 20, backgroundColor: '#1e95c3', margin: '30px 0 -4px 0',
                   }}
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;属性
@@ -434,15 +432,14 @@ class SearchPage extends React.Component {
               <div style={{ color: '#1e95c3', fontWeight: 'bold', marginBottom: 20 }}>
                 <div
                   style={{
-                    display: 'inline-block', width: 10, height: 20,
-                    backgroundColor: '#1e95c3', margin: '30px 0 -4px 0',
+                    display: 'inline-block', width: 10, height: 20, backgroundColor: '#1e95c3', margin: '30px 0 -4px 0',
                   }}
                 />
                 &nbsp;&nbsp;&nbsp;&nbsp;资源链接
               </div>
               <Spin spinning={loading}>
                 <LinkList data={linkData} />
-              </Spin> */}
+              </Spin>
             </div>
           </Col>
           <Col span={11} style={{ padding: '0 20px' }}>
