@@ -4,6 +4,7 @@ import { connect } from 'dva'
 // import { routerRedux } from 'dva/router'
 import { getUrlParams } from '@/utils/common'
 import { newSearch } from '@/services/edukg'
+import NewGraph from '@/pages/graph/newGraph'
 
 let localCounter = 0
 const { Option } = AutoComplete
@@ -17,24 +18,25 @@ class ClusterBroker extends React.Component {
       loading: false,
       dataSource: [],
       options: [],
+      uri: '',
     }
   }
 
   componentWillMount = () => {
-    this.search()
+    this.search(this.state.filter)
   }
 
   searchSelect = async () => {
     this.setState({ options: [] })
   }
 
-  search = async () => {
-    this.setState({ loading: true })
+  search = async (filter) => {
+    this.setState({ loading: true, filter })
     const data = await newSearch({
-      searchKey: this.state.filter,
+      searchKey: filter,
     })
-    if (data) {
-      this.setState({ dataSource: data.data })
+    if (data.data) {
+      this.setState({ dataSource: data.data, uri: data.data[0] ? data.data[0].uri : '' })
     }
     this.setState({ loading: false })
   }
@@ -69,7 +71,7 @@ class ClusterBroker extends React.Component {
 
   render() {
     const {
-      dataSource, filter, loading, options,
+      dataSource, filter, loading, options, uri,
     } = this.state
     return (
       <div style={{ padding: 20 }}>
@@ -104,7 +106,10 @@ class ClusterBroker extends React.Component {
             pagination={{
               showSizeChanger: true,
               showQuickJumper: true,
+              pageSize: 20,
+              size: 'small',
             }}
+            style={{ float: 'left', width: 300 }}
             renderItem={(item) => {
               return (
                 <List.Item style={{ padding: '20px 0 0 20px' }}>
@@ -112,7 +117,7 @@ class ClusterBroker extends React.Component {
                     title={(
                       <a
                         href="javascript:;"
-                        onClick={() => window.open(`/newGraph?uri=${escape(item.uri)}`)}
+                        onClick={() => this.setState({ uri: item.uri })}
                       >
                         {this.handleHighlight(item.label, filter)}
                       </a>
@@ -122,6 +127,9 @@ class ClusterBroker extends React.Component {
               )
             }}
           />
+          <div style={{ overflow: 'hidden' }}>
+            <NewGraph uri={uri} search={this.search} />
+          </div>
         </div>
       </div>
     )

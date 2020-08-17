@@ -6,7 +6,6 @@ import Background from '@/assets/banner2.jpg'
 import Logo from '@/assets/homeLogo.png'
 
 let localCounter = 0
-const { Option } = AutoComplete
 
 @connect()
 class ClusterBroker extends React.Component {
@@ -14,12 +13,7 @@ class ClusterBroker extends React.Component {
     super(props)
     this.state = {
       filter: '',
-      data: [],
     }
-  }
-
-  search = async () => {
-    this.setState({ data: [] })
   }
 
   handleJump = (value) => {
@@ -46,24 +40,10 @@ class ClusterBroker extends React.Component {
   }
 
   handleInputChange = (value) => {
-    this.setState({ filter: value }, () => setTimeout(() => this.search(value), 1000))
-  }
-
-  renderOption = (data) => {
-    const children = []
-    // const { filter } = this.state
-    // data.forEach(item => children.push(
-    //   <Option key={item} value={item}>
-    //     {this.handleHighlight(item, filter)}
-    //   </Option>,
-    // ))
-    return children
+    this.setState({ filter: value })
   }
 
   render() {
-    const {
-      data,
-    } = this.state
     return (
       <div style={{ textAlign: 'center', background: `url("${Background}") repeat`, height: '100%', minHeight: 800 }}>
         <div style={{ display: 'inline-block', marginTop: '10%', marginLeft: -30 }}>
@@ -82,7 +62,7 @@ class ClusterBroker extends React.Component {
             style={{
               width: 500, float: 'left',
             }}
-            dataSource={this.renderOption(data)}
+            dataSource={[]}
             onChange={value => this.handleInputChange(value)}
             onSelect={value => this.setState({ filter: value })}
             backfill
