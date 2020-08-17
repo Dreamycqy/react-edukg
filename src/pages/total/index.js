@@ -161,7 +161,7 @@ class SearchPage extends React.Component {
         current: data.fullsearch.data.pager.curPage,
         pageSize: data.fullsearch.data.pager.pageSize,
         total: data.fullsearch.data.pager.totalCount,
-        info: data.graphandproperties[0],
+        info: data.graphandproperties ? data.graphandproperties[0] : null,
         instances: data.instanceList,
         linkData: { doc, video },
       })
@@ -230,6 +230,9 @@ class SearchPage extends React.Component {
   }
 
   renderInstance = (obj) => {
+    if (!obj) {
+      return
+    }
     const result = []
     const data = []
     obj.data.forEach((e) => {
@@ -351,7 +354,7 @@ class SearchPage extends React.Component {
     } = this.state
     const { locale } = this.props
     return (
-      <div style={{ minWidth: 1300 }}>
+      <div style={{ minWidth: 1300, marginBottom: 20 }}>
         <div
           style={{ height: 60, backgroundImage: `url(${backgroundImage})`, paddingLeft: 24 }}
         >
@@ -359,7 +362,7 @@ class SearchPage extends React.Component {
             color: '#1e95c3', float: 'left', fontWeight: 'bold', display: 'inline-block', lineHeight: '58px', marginRight: 10,
           }}
           >
-            eduKG
+            SEKG
           </span>
           <Input
             value={searchKey}

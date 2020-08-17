@@ -105,3 +105,19 @@ export function fyTotal(body, rSymbol) {
     rSymbol,
   })
 }
+
+export function newSearch(body, rSymbol) {
+  return request.get({
+    url: '/edukg/api/science/search',
+    data: body,
+    rSymbol,
+  })
+}
+
+export function newResult(body, rSymbol) {
+  return request.get({
+    url: '/edukg/api/science/querygraphByUri',
+    data: body,
+    rSymbol,
+  })
+}

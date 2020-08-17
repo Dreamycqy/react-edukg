@@ -6,6 +6,8 @@ import Link from 'umi/link'
 import zh_CN from 'antd/lib/locale-provider/zh_CN'
 import en_GB from 'antd/lib/locale-provider/en_GB'
 import menuList from '@/constants/menuList'
+import logoFooter from '@/assets/logofooter.png'
+import qrcode from '@/assets/qrcode.png'
 
 const {
   Header, Footer, Content,
@@ -65,7 +67,7 @@ class MainLayout extends React.Component {
           >
             <div
               style={{
-                width: 120,
+                width: 300,
                 height: 31,
                 marginLeft: 30,
                 float: 'left',
@@ -74,9 +76,9 @@ class MainLayout extends React.Component {
                 lineHeight: '60px',
               }}
             >
-              <Link to="">eduKG</Link>
+              <Link to="">SEKG 科学教育图谱</Link>
             </div>
-            <div
+            {/* <div
               style={{
                 lineHeight: '58px', position: 'absolute', right: 80, cursor: 'pointer',
               }}
@@ -91,7 +93,7 @@ class MainLayout extends React.Component {
               onClick={() => window.open('http://edukg.cn/qa-api')}
             >
               APIs
-            </div>
+            </div> */}
             <Menu
               mode="horizontal"
               selectedKeys={[this.state.key]}
@@ -105,10 +107,37 @@ class MainLayout extends React.Component {
             {this.props.children}
           </Content>
           <Footer
-            style={{ textAlign: 'center' }}
+            style={{
+              backgroundColor: '#4f5056',
+              color: '#e2e2e2',
+              margin: 0,
+              textAlign: 'left',
+              padding: '45px 0',
+              fontSize: 14,
+            }}
           >
-            <p>Copyright© 2018 KEG，Tsinghua University</p>
-            <p>地址：清华大学东主楼</p>
+            <div>
+              <div
+                style={{
+                  boxSizing: 'border-box',
+                  marginLeft: 20,
+                  marginRight: 20,
+                }}
+              >
+                <div style={{ float: 'left' }}>
+                  <p><img src={logoFooter} alt="" /></p>
+                  <p>©版权所有：互联网教育智能技术及应用国家工程实验室</p>
+                  <p>
+                    地址：北京市昌平区沙河镇满井路甲2号 北京师范大学昌平校园&nbsp;|&nbsp;邮箱：
+                    <a href="mailto:CIT@bnu.edu.cn">CIT@bnu.edu.cn</a>
+                    &nbsp;|&nbsp;电话：010-58807205
+                  </p>
+                </div>
+                <div style={{ float: 'right' }}>
+                  <img src={qrcode} alt="qrcode" />
+                </div>
+              </div>
+            </div>
           </Footer>
         </ConfigProvider>
       </Layout>

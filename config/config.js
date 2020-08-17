@@ -24,7 +24,7 @@ export default {
       antd: true,
       dva: true,
       dynamicImport: true,
-      title: 'edukg',
+      title: 'SEKG',
       dll: false,
       hardSource: false,
     }],

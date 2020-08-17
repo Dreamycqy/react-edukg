@@ -73,11 +73,11 @@ export default class GraphChart extends React.Component {
       return
     }
     if (category !== '1') {
-      const { uri, course } = data
-      window.open(`firstGraph?uri=${encodeURIComponent(uri)}&subject=${course}`)
+      const { uri } = data
+      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     } else if (data.symbol === 'rect') {
-      const { uri, course } = data
-      window.open(`firstGraph?uri=${encodeURIComponent(uri)}&subject=${course}`)
+      const { uri } = data
+      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     }
   }
 

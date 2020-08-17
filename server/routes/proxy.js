@@ -9,11 +9,15 @@ router.all('/', (req, res) => {
   const { hostname } = req
   const { method } = req
   let url = req.baseUrl
-  const { basePath } = config
+  const { basePath, newPath } = config
   if (url.indexOf('api') > -1) {
     url = url.split('/api')[1] // eslint-disable-line
   }
-  url = (typeof basePath === 'string' ? basePath : basePath[hostname]) + url
+  if (url.indexOf('science') > -1) {
+    url = newPath + url
+  } else {
+    url = (typeof basePath === 'string' ? basePath : basePath[hostname]) + url
+  }
   if (url.indexOf('kCardSearch') > -1) {
     url = 'http://166.111.68.66:8077/linkInstance'
   }

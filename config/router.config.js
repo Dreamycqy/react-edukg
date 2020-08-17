@@ -5,44 +5,52 @@ export default [
     routes: [
       {
         path: '/',
-        component: './index',
+        component: './home',
       },
       {
-        path: 'fy',
-        component: './fy',
+        path: 'searchPage',
+        component: './home/searchPage',
       },
       {
-        path: 'total',
-        component: './total',
+        path: 'newGraph',
+        component: './graph/newGraph',
       },
-      {
-        path: 'graph',
-        component: './graph',
-      },
-      {
-        path: 'firstGraph',
-        component: './graph/firstGraph',
-      },
-      {
-        path: 'knowledgeCard',
-        component: './knowledgeCard',
-      },
-      {
-        path: 'qa',
-        component: './qa',
-      },
-      {
-        path: 'relatedPage',
-        component: './relatedPage',
-      },
-      {
-        path: 'getCard',
-        component: './knowledgeCard/getCard',
-      },
-      {
-        path: 'team',
-        component: './team',
-      },
+      // {
+      //   path: 'fy',
+      //   component: './fy',
+      // },
+      // {
+      //   path: 'total',
+      //   component: './total',
+      // },
+      // {
+      //   path: 'graph',
+      //   component: './graph',
+      // },
+      // {
+      //   path: 'firstGraph',
+      //   component: './graph/firstGraph',
+      // },
+      // {
+      //   path: 'knowledgeCard',
+      //   component: './knowledgeCard',
+      // },
+      // {
+      //   path: 'qa',
+      //   component: './qa',
+      // },
+      // {
+      //   path: 'relatedPage',
+      //   component: './relatedPage',
+      // },
+      // {
+      //   path: 'getCard',
+      //   component: './knowledgeCard/getCard',
+      // },
+      // {
+      //   path: 'team',
+      //   component: './team',
+      // },
     ],
   },
 ]
