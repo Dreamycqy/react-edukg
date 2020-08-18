@@ -135,7 +135,6 @@ class FirstGraph extends React.Component {
                     title={(
                       <a
                         href="javascript:;"
-                        target="_blank"
                         onClick={() => {}}
                       >
                         <span>{item.title_zh}</span>

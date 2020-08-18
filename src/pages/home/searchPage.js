@@ -7,7 +7,6 @@ import { newSearch } from '@/services/edukg'
 import NewGraph from '@/pages/graph/newGraph'
 
 let localCounter = 0
-const { Option } = AutoComplete
 
 @connect()
 class ClusterBroker extends React.Component {
@@ -53,20 +52,9 @@ class ClusterBroker extends React.Component {
     this.setState({ filter: value })
   }
 
-  renderOption = (data) => {
-    const children = []
-    const { filter } = this.state
-    data.forEach(item => children.push(
-      <Option key={item} value={item}>
-        {this.handleHighlight(item, filter)}
-      </Option>,
-    ))
-    return children
-  }
-
   render() {
     const {
-      dataSource, filter, loading, options, uri,
+      dataSource, filter, loading, uri,
     } = this.state
     return (
       <div style={{ padding: 20 }}>
@@ -76,7 +64,7 @@ class ClusterBroker extends React.Component {
             style={{
               width: 444, float: 'left',
             }}
-            dataSource={this.renderOption(options)}
+            dataSource={[]}
             value={filter}
             onChange={value => this.handleInputChange(value, 'search')}
             onSelect={value => this.setState({ filter: value })}
@@ -86,7 +74,7 @@ class ClusterBroker extends React.Component {
             defaultActiveFirstOption={false}
           >
             <Input
-              onPressEnter={e => this.search('result', e.target.value)}
+              onPressEnter={e => this.search(e.target.value)}
               style={{ borderBottomRightRadius: 0, borderTopRightRadius: 0 }}
             />
           </AutoComplete>
