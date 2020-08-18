@@ -28,6 +28,13 @@ class MainLayout extends React.Component {
     }
   }
 
+  componentWillReceiveProps = () => {
+    const key = window.location.pathname.split('/')[1]
+    this.setState({
+      key,
+    })
+  }
+
   handleSelect = (key) => {
     this.setState({ key })
     router.push(`/${key === 'home' ? '' : key}`)

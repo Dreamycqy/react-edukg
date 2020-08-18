@@ -17,17 +17,12 @@ class ClusterBroker extends React.Component {
       filter: getUrlParams().filter || '',
       loading: false,
       dataSource: [],
-      options: [],
       uri: '',
     }
   }
 
   componentWillMount = () => {
     this.search(this.state.filter)
-  }
-
-  searchSelect = async () => {
-    this.setState({ options: [] })
   }
 
   search = async (filter) => {
@@ -55,7 +50,7 @@ class ClusterBroker extends React.Component {
   }
 
   handleInputChange = (value) => {
-    this.setState({ filter: value }, () => setTimeout(() => this.searchSelect(value), 1000))
+    this.setState({ filter: value })
   }
 
   renderOption = (data) => {
@@ -95,7 +90,7 @@ class ClusterBroker extends React.Component {
               style={{ borderBottomRightRadius: 0, borderTopRightRadius: 0 }}
             />
           </AutoComplete>
-          <Button style={{ float: 'left', borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }} type="primary" size="large" onClick={() => this.search('result')}>搜索</Button>
+          <Button style={{ float: 'left', borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }} type="primary" size="large" onClick={() => this.search(filter)}>搜索</Button>
         </div>
         <div style={{ minHeight: 500 }}>
           <List
