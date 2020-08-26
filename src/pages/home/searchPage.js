@@ -5,6 +5,7 @@ import { connect } from 'dva'
 import { getUrlParams } from '@/utils/common'
 import { newSearch } from '@/services/edukg'
 import NewGraph from '@/pages/graph/newGraph'
+import kgIcon from '@/assets/kgIcon.png'
 
 let localCounter = 0
 
@@ -17,20 +18,24 @@ class ClusterBroker extends React.Component {
       loading: false,
       dataSource: [],
       uri: '',
+      firstIn: true,
     }
   }
 
   componentWillMount = () => {
-    this.search(this.state.filter)
+    // this.search(this.state.filter)
   }
 
   search = async (filter) => {
-    this.setState({ loading: true, filter })
+    this.setState({ loading: true, filter, firstIn: false })
     const data = await newSearch({
       searchKey: filter,
     })
     if (data.data) {
-      this.setState({ dataSource: data.data, uri: data.data[0] ? data.data[0].uri : '' })
+      this.setState({
+        dataSource: data.data,
+        uri: data.data[0] ? data.data[0].uri : '',
+      })
     }
     this.setState({ loading: false })
   }
@@ -54,7 +59,7 @@ class ClusterBroker extends React.Component {
 
   render() {
     const {
-      dataSource, filter, loading, uri,
+      dataSource, filter, loading, uri, firstIn,
     } = this.state
     return (
       <div style={{ padding: 20, minWidth: 1200 }}>
@@ -126,9 +131,27 @@ class ClusterBroker extends React.Component {
           <NewGraph uri={uri} search={this.search} />
         </div>
         <Empty
-          style={{ marginTop: 200, display: dataSource.length === 0 ? 'block' : 'none' }}
+          style={{ marginTop: 200, display: dataSource.length === 0 && firstIn === false ? 'block' : 'none' }}
           description="没有结果"
         />
+        <div
+          style={{ marginTop: 200, display: firstIn === true ? 'block' : 'none', textAlign: 'center' }}
+        >
+          <div style={{ display: 'inline-block' }}>
+            <img src={kgIcon} alt="" width="200px" style={{ float: 'left' }} />
+            <div style={{ width: 560, overflow: 'hidden', paddingTop: 30, paddingLeft: 50 }}>
+              科学教育知识图谱是以中国的科学课程标准、
+              美国的《Next Generation Science Standards》为基础，
+              结合基础教育知识图谱edukg中的内容构建而成的面向科学教育的知识图谱。
+              该图谱涵盖地球与宇宙科学、物质科学、生命科学三大模块，
+              涉及到物理、化学、地理、生物四门学科，
+              适合从小学起各个学段的学生和教师进行学习和使用。
+              图谱中将科学学科的核心概念表示为树状知识体系，各个知识点以实体的形式展示。
+              为充分利用互联网的学习资源，本图谱将科普中国等多个网站的图文、视频、学术论文等资源与知识点进行链接，
+              实现知识的互联共通。
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
