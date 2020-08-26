@@ -2,6 +2,7 @@ import React from 'react'
 import echarts from 'echarts'
 import _ from 'lodash'
 import resizeListener, { unbind } from 'element-resize-event'
+import color from '@/constants/colorList'
 
 export default class GraphChart extends React.Component {
   constructor(...props) {
@@ -14,7 +15,9 @@ export default class GraphChart extends React.Component {
     const { graph, forcename } = this.props
     try {
       this.instance = this.renderChart(this.dom, graph, forcename, this.instance)
+      console.log(graph)
       resizeListener(this.dom, () => {
+        console.log(graph)
         this.instance = this.renderChart(this.dom, graph, forcename, this.instance, true)
       })
     } catch (e) {
@@ -74,11 +77,11 @@ export default class GraphChart extends React.Component {
     }
     if (category !== '1') {
       const { name } = data
-      this.props.search(name)
+      this.props.search(name.split(' (')[0])
       // window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     } else if (data.symbol === 'rect') {
       const { name } = data
-      this.props.search(name)
+      this.props.search(name.split(' (')[0])
       // window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     }
   }
@@ -104,7 +107,7 @@ export default class GraphChart extends React.Component {
       options = {
         ...options,
         title: {
-          text: '暂无数据',
+          // text: '暂无数据',
           x: '56%',
           y: 'center',
         },
@@ -112,6 +115,7 @@ export default class GraphChart extends React.Component {
     } else {
       const nodes = that.hide(graph.nodes)
       options = {
+        color: color['line'],
         series: [{
           type: 'graph',
           layout: 'force',

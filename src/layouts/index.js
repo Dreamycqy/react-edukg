@@ -1,7 +1,6 @@
 import React from 'react'
 import { Layout, ConfigProvider, Menu } from 'antd'
 import { connect } from 'dva'
-import router from 'umi/router'
 import Link from 'umi/link'
 import zh_CN from 'antd/lib/locale-provider/zh_CN'
 import en_GB from 'antd/lib/locale-provider/en_GB'
@@ -21,25 +20,6 @@ function mapStateToProps(state) {
 }
 @connect(mapStateToProps)
 class MainLayout extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      key: window.location.pathname.split('/')[1] || 'home',
-    }
-  }
-
-  componentWillReceiveProps = () => {
-    const key = window.location.pathname.split('/')[1]
-    this.setState({
-      key,
-    })
-  }
-
-  handleSelect = (key) => {
-    this.setState({ key })
-    router.push(`/${key === 'home' ? '' : key}`)
-  }
-
   handleLocaleChange = () => {
     this.props.dispatch({
       type: 'global/updateState',
@@ -63,13 +43,14 @@ class MainLayout extends React.Component {
         <ConfigProvider locale={this.props.locale === 'cn' ? zh_CN : en_GB}>
           <Header
             style={{
-              height: 60,
-              backgroundColor: '#fff',
+              height: 40,
+              backgroundColor: '#001529',
               borderBottom: '1px solid #e8e8e8',
               position: 'fixed',
               top: 0,
               zIndex: 999,
               width: '100%',
+              padding: 0,
             }}
           >
             <div
@@ -78,60 +59,23 @@ class MainLayout extends React.Component {
                 height: 31,
                 marginLeft: 30,
                 float: 'left',
-                fontSize: 28,
+                fontSize: 14,
                 fontWeight: 700,
-                lineHeight: '60px',
+                lineHeight: '40px',
               }}
             >
               <Link to="">SEKG 科学教育图谱</Link>
             </div>
-            {/* <div
-              style={{
-                lineHeight: '58px', position: 'absolute', right: 80, cursor: 'pointer',
-              }}
-              onClick={() => this.handleLocaleChange()}
-            >
-              {this.props.locale === 'cn' ? 'EN' : '中文'}
-            </div>
-            <div
-              style={{
-                lineHeight: '58px', position: 'absolute', right: 30, cursor: 'pointer',
-              }}
-              onClick={() => window.open('http://edukg.cn/qa-api')}
-            >
-              APIs
-            </div> */}
-            <Menu
-              mode="horizontal"
-              selectedKeys={[this.state.key]}
-              style={{ lineHeight: '58px', position: 'absolute', right: 140 }}
-              onClick={e => this.handleSelect(e.key)}
-            >
-              {this.makeMenu()}
-            </Menu>
           </Header>
-          <Content style={{ backgroundColor: '#fff', minHeight: 800, marginTop: 60 }}>
+          <Content style={{ backgroundColor: 'aliceblue', minHeight: 700, marginTop: 40 }}>
             {this.props.children}
           </Content>
           <Footer
-            style={{
-              backgroundColor: '#4f5056',
-              color: '#e2e2e2',
-              margin: 0,
-              textAlign: 'left',
-              padding: '45px 0',
-              fontSize: 14,
-            }}
+            style={{ backgroundColor: '#001529', padding: 30 }}
           >
-            <div>
-              <div
-                style={{
-                  boxSizing: 'border-box',
-                  marginLeft: 20,
-                  marginRight: 20,
-                }}
-              >
-                <div style={{ float: 'left' }}>
+            <div style={{ padding: '0 30px' }}>
+              <div>
+                <div style={{ float: 'left', color: 'white' }}>
                   <p><img src={logoFooter} alt="" /></p>
                   <p>©版权所有：互联网教育智能技术及应用国家工程实验室</p>
                   <p>

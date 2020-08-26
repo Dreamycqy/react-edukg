@@ -1,4 +1,5 @@
 export const graphData = (data, course) => {
+  const test = /^[A-Za-z]+$/i
   const nodes = []
   const links = []
   const forcename = data.content.self.label
@@ -13,10 +14,21 @@ export const graphData = (data, course) => {
     label: {
       normal: {
         show: true,
-        position: 'inside',
-        formatter: '{b}',
-        fontSize: 16,
-        fontStyle: '100',
+        position: 'bottom',
+        formatter: (val) => {
+          const strs = val.data.name.replace(' ', '\n').split('')
+          let str = ''
+          for (let j = 0, s; s = strs[j++];) {
+            str += s
+            if (!(j % 8) && !test.test(s)) str += '\n'
+          }
+          return str
+        },
+        textStyle: {
+          color: '#000000',
+          fontWeight: 'normal',
+          fontSize: '12',
+        },
       },
     },
   })
@@ -49,10 +61,21 @@ export const graphData = (data, course) => {
           label: {
             normal: {
               show: true,
-              position: 'inside',
-              formatter: '{b}',
-              fontSize: 14,
-              fontStyle: '100',
+              position: 'bottom',
+              formatter: (val) => {
+                const strs = val.data.name.replace(' ', '\n').split('')
+                let str = ''
+                for (let j = 0, s; s = strs[j++];) {
+                  str += s
+                  if (!(j % 8) && !test.test(s)) str += '\n'
+                }
+                return str
+              },
+              textStyle: {
+                color: '#000000',
+                fontWeight: 'normal',
+                fontSize: '12',
+              },
             },
           },
         })
@@ -72,10 +95,21 @@ export const graphData = (data, course) => {
             label: {
               normal: {
                 show: true,
-                position: 'top',
-                formatter: '{b}',
-                fontSize: 10,
-                fontStyle: '100',
+                position: 'bottom',
+                formatter: (val) => {
+                  const strs = val.data.name.replace(' ', '\n').split('')
+                  let str = ''
+                  for (let j = 0, s; s = strs[j++];) {
+                    str += s
+                    if (!(j % 8) && !test.test(s)) str += '\n'
+                  }
+                  return str
+                },
+                textStyle: {
+                  color: '#000000',
+                  fontWeight: 'normal',
+                  fontSize: '12',
+                },
               },
             },
           })
@@ -97,10 +131,21 @@ export const graphData = (data, course) => {
             label: {
               normal: {
                 show: true,
-                position: 'inside',
-                formatter: '{b}',
-                fontSize: 14,
-                fontStyle: '100',
+                position: 'bottom',
+                formatter: (val) => {
+                  const strs = val.data.name.replace(' ', '\n').split('')
+                  let str = ''
+                  for (let j = 0, s; s = strs[j++];) {
+                    str += s
+                    if (!(j % 8) && !test.test(s)) str += '\n'
+                  }
+                  return str
+                },
+                textStyle: {
+                  color: '#000000',
+                  fontWeight: 'normal',
+                  fontSize: '12',
+                },
               },
             },
           })
@@ -123,10 +168,21 @@ export const graphData = (data, course) => {
           label: {
             normal: {
               show: true,
-              position: 'inside',
-              formatter: '{b}',
-              fontSize: 14,
-              fontStyle: '100',
+              position: 'bottom',
+              formatter: (val) => {
+                const strs = val.data.name.replace(' ', '\n').split('')
+                let str = ''
+                for (let j = 0, s; s = strs[j++];) {
+                  str += s
+                  if (!(j % 8) && !test.test(s)) str += '\n'
+                }
+                return str
+              },
+              textStyle: {
+                color: '#000000',
+                fontWeight: 'normal',
+                fontSize: '12',
+              },
             },
           },
         })

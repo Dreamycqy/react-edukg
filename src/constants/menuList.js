@@ -1,8 +1,8 @@
 export default {
-  home: {
-    cn: '首页',
-    en: 'Home',
-  },
+  // home: {
+  //   cn: '首页',
+  //   en: 'Home',
+  // },
   searchPage: {
     cn: '搜索',
     en: 'Search',
