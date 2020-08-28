@@ -1,11 +1,11 @@
 import React from 'react'
 import { Button, AutoComplete, Input, List, Empty, Avatar } from 'antd'
 import { connect } from 'dva'
-// import { routerRedux } from 'dva/router'
-import { getUrlParams } from '@/utils/common'
+import _ from 'lodash'
+import { routerRedux } from 'dva/router'
 import { newSearch } from '@/services/edukg'
-import NewGraph from '@/pages/graph/newGraph'
 import kgIcon from '@/assets/kgIcon.png'
+// import colorList from '@/constants/colorList'
 
 let localCounter = 0
 
@@ -14,16 +14,14 @@ class ClusterBroker extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      filter: getUrlParams().filter || '',
+      filter: '',
       loading: false,
       dataSource: [],
-      uri: '',
       firstIn: true,
     }
   }
 
   componentWillMount = () => {
-    // this.search(this.state.filter)
   }
 
   search = async (filter) => {
@@ -34,7 +32,6 @@ class ClusterBroker extends React.Component {
     if (data.data) {
       this.setState({
         dataSource: data.data,
-        uri: data.data[0] ? data.data[0].uri : '',
       })
     }
     this.setState({ loading: false })
@@ -57,34 +54,61 @@ class ClusterBroker extends React.Component {
     this.setState({ filter: value })
   }
 
+  handleJump = (uri) => {
+    this.props.dispatch(routerRedux.push({
+      pathname: '/newGraph',
+      query: {
+        uri: escape(uri),
+      },
+    }))
+  }
+
   render() {
     const {
-      dataSource, filter, loading, uri, firstIn,
+      dataSource, filter, loading, firstIn,
     } = this.state
     return (
-      <div style={{ padding: 20, minWidth: 1200 }}>
-        <div style={{ float: 'left', width: 420, marginBottom: 20 }}>
-          <div style={{ height: 60 }}>
+      <div style={{ padding: '20px 0', minWidth: 1200 }}>
+        <div style={{ marginBottom: 20, textAlign: 'center' }}>
+          <div style={{ height: 120, width: 900, display: 'inline-block' }}>
             <AutoComplete
               size="large"
               style={{
-                width: 340, float: 'left',
+                width: 720, float: 'left',
               }}
               dataSource={[]}
               value={filter}
               onChange={value => this.handleInputChange(value, 'search')}
               onSelect={value => this.setState({ filter: value })}
               backfill
-              placeholder="请输入科学教育相关知识点"
               optionLabelProp="value"
               defaultActiveFirstOption={false}
             >
               <Input
                 onPressEnter={e => this.search(e.target.value)}
-                style={{ borderBottomRightRadius: 0, borderTopRightRadius: 0 }}
+                placeholder="请输入科学教育相关知识点"
+                style={{
+                  borderBottomRightRadius: 0,
+                  borderTopRightRadius: 0,
+                  height: 60,
+                  lineHeight: '60px',
+                  fontSize: 24,
+                }}
               />
             </AutoComplete>
-            <Button style={{ float: 'left', borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }} type="primary" size="large" onClick={() => this.search(filter)}>搜索</Button>
+            <Button
+              style={{
+                float: 'left',
+                width: 180,
+                height: 60,
+                borderBottomLeftRadius: 0,
+                borderTopLeftRadius: 0,
+              }}
+              type="primary" size="large"
+              onClick={() => this.search(filter)}
+            >
+              搜索
+            </Button>
           </div>
           <List
             itemLayout="vertical"
@@ -92,50 +116,70 @@ class ClusterBroker extends React.Component {
             dataSource={dataSource}
             loading={loading}
             style={{
-              width: 410,
-              border: '1px solid #e8e8e8',
+              // border: '1px solid #e8e8e8',
+              width: 900,
               display: dataSource.length > 0 ? 'block' : 'none',
-              overflowY: 'scroll',
               backgroundColor: 'white',
-              maxHeight: 1100,
               borderRadius: 4,
+              margin: '0 auto',
+              textAlign: 'left',
+            }}
+            pagination={{
+              showQuickJumper: true,
             }}
             renderItem={(item) => {
+              const target1 = _.find(item.property, { predicate_label: '' })
+              const target2 = _.find(item.property, { predicate_label: '分类' })
               return (
-                <List.Item style={{ padding: '20px 20px 0 20px' }}>
+                <List.Item style={{ padding: 20 }}>
                   <List.Item.Meta
-                    avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                    avatar={<Avatar size={64}>{item.label.substr(0, 1)}</Avatar>}
                     title={(
                       <a
                         href="javascript:;"
                         onClick={() => {
-                          this.setState({ uri: item.uri })
+                          // this.handleJump(item.uri)
+                          window.open(`/newGraph?uri=${escape(item.uri)}`)
                         }}
                       >
                         {this.handleHighlight(item.label, filter)}
                       </a>
                     )}
-                    description="Heres some descriptions."
+                    description={(
+                      <span>
+                        <span
+                          style={{
+                            color: 'white',
+                            padding: '2px 20px',
+                            display: 'inline-block',
+                            textAlign: 'center',
+                            border: '1px solid',
+                            backgroundColor: target2 ? '#24b0e6' : '#28d100',
+                            borderColor: target2 ? '#24b0e6' : '#28d100',
+                            borderRadius: 4,
+                            marginRight: 12,
+                          }}
+                        >
+                          {target2 ? '分类' : '属性'}
+                        </span>
+                        <span>{target2 ? target2.object_label : target1.object}</span>
+                      </span>
+                    )}
                   />
+                  <div style={{ color: '#888', fontSize: 12, marginLeft: 80 }}>
+                    {`uri: ${item.uri}`}
+                  </div>
                 </List.Item>
               )
             }}
           />
-        </div>
-        <div
-          style={{
-            overflow: 'hidden',
-            display: dataSource.length > 0 ? 'block' : 'none',
-          }}
-        >
-          <NewGraph uri={uri} search={this.search} />
         </div>
         <Empty
           style={{ marginTop: 200, display: dataSource.length === 0 && firstIn === false ? 'block' : 'none' }}
           description="没有结果"
         />
         <div
-          style={{ marginTop: 200, display: firstIn === true ? 'block' : 'none', textAlign: 'center' }}
+          style={{ marginTop: 100, display: firstIn === true ? 'block' : 'none', textAlign: 'center' }}
         >
           <div style={{ display: 'inline-block' }}>
             <img src={kgIcon} alt="" width="200px" style={{ float: 'left' }} />

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Card, Spin, Table, List, Icon, Switch } from 'antd'
+import { Card, Spin, Table, List, Icon, Cascader } from 'antd'
 import _ from 'lodash'
+import { getUrlParams } from '@/utils/common'
 import Chart from '@/components/charts/graph'
 import { newResult } from '@/services/edukg'
 import { graphData } from '@/utils/graphData'
@@ -32,6 +33,34 @@ const columns = [{
   },
 }]
 
+const options = [{
+  value: 'score',
+  label: '相关度',
+  children: [
+    {
+      value: 'desc',
+      label: '倒序',
+    },
+    {
+      value: 'asc',
+      label: '正序',
+    },
+  ],
+}, {
+  value: 'year',
+  label: '出版时间',
+  children: [
+    {
+      value: 'desc',
+      label: '倒序',
+    },
+    {
+      value: 'asc',
+      label: '正序',
+    },
+  ],
+}]
+
 class FirstGraph extends React.Component {
   constructor(props) {
     super(props)
@@ -43,20 +72,13 @@ class FirstGraph extends React.Component {
       forcename: '',
       dataSource: [],
       loading: false,
-      uri: this.props.uri,
-      checked: true,
+      uri: unescape(getUrlParams().uri || ''),
+      filter: ['score', 'desc'],
     }
   }
 
   componentWillMount() {
     this.getChart()
-  }
-
-  componentWillReceiveProps = async (nextProps) => {
-    if (nextProps.uri !== this.state.uri) {
-      await this.setState({ uri: nextProps.uri })
-      this.getChart()
-    }
   }
 
   getChart = async () => {
@@ -95,7 +117,7 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      graph, forcename, dataSource, loading, resource, checked,
+      graph, forcename, dataSource, loading, resource, filter,
     } = this.state
     return (
       <div style={{ paddingTop: 10 }}>
@@ -127,22 +149,23 @@ class FirstGraph extends React.Component {
           style={{ margin: 20 }}
           title="相关论文"
           extra={(
-            <Switch
-              checked={checked}
-              checkedChildren="相关度正序" unCheckedChildren="相关度反序"
-              onChange={e => this.setState({ checked: e })}
+            <Cascader
+              options={options}
+              value={filter}
+              onChange={value => this.setState({ filter: value })}
+              allowClear={false}
             />
           )}
         >
           <List
             itemLayout="vertical"
             size="large"
-            dataSource={_.orderBy(resource, 'score', checked === true ? 'desc' : 'asc')}
+            dataSource={_.orderBy(resource, filter[0], filter[1])}
             loading={loading}
             pagination={{
               showSizeChanger: false,
               size: 'small',
-              style: { display: resource.length > 0 ? 'block' : 'none' },
+              style: { display: typeof resource === 'object' && resource.length > 0 ? 'block' : 'none' },
             }}
             style={{ height: 400, overflowY: 'scroll', padding: '0 20px 20px 20px' }}
             renderItem={(item) => {
@@ -186,14 +209,14 @@ class FirstGraph extends React.Component {
                     )}
                   />
                   <div>
-                    <div style={{ color: '#00000073' }}>
+                    {/* <div style={{ color: '#00000073' }}>
                       <Icon
                         type="diff"
                         style={{ marginRight: 8, color: '#24b0e6' }}
                       />
                       相关度：
                       <span style={{ color: 'red' }}>{item.score}</span>
-                    </div>
+                    </div> */}
                     <div style={{ marginTop: 10, color: '#00000073' }}>
                       <Icon
                         type="user"

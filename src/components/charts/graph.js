@@ -71,18 +71,14 @@ export default class GraphChart extends React.Component {
 
   jumpToGraph = (param) => {
     const { data } = param
-    const { category } = data
+    const { category, uri } = data
     if (category === '0') {
       return
     }
     if (category !== '1') {
-      const { name } = data
-      this.props.search(name.split(' (')[0])
-      // window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
+      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     } else if (data.symbol === 'rect') {
-      const { name } = data
-      this.props.search(name.split(' (')[0])
-      // window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
+      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
     }
   }
 

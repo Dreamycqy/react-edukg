@@ -67,7 +67,7 @@ class MainLayout extends React.Component {
               <Link to="">SEKG 科学教育图谱</Link>
             </div>
           </Header>
-          <Content style={{ backgroundColor: 'aliceblue', minHeight: 700, marginTop: 40 }}>
+          <Content style={{ backgroundColor: '#fff', minHeight: 800, marginTop: 40 }}>
             {this.props.children}
           </Content>
           <Footer

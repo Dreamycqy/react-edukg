@@ -1,5 +1,5 @@
 export default {
-  bar: ['#4e9bd2', '#eb7e3d', '#aeaeae', '#72ac4d', '#fec333', '#5e9cd3'],
+  icon: ['#eb7e3d', '#fec333', '#5e9cd3', '#AB82FF', '#FFBBFF', '#ff4040'],
   line: [
     '#FF0000',
     '#32CD32',
