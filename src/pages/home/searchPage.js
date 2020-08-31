@@ -1,9 +1,10 @@
 import React from 'react'
 import { Button, AutoComplete, Input, List, Empty, Avatar } from 'antd'
 import { connect } from 'dva'
-import _ from 'lodash'
+// import _ from 'lodash'
 import { routerRedux } from 'dva/router'
 import { newSearch } from '@/services/edukg'
+import { getUrlParams } from '@/utils/common'
 import kgIcon from '@/assets/kgIcon.png'
 // import colorList from '@/constants/colorList'
 
@@ -14,7 +15,7 @@ class ClusterBroker extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      filter: '',
+      filter: getUrlParams().filter || '',
       loading: false,
       dataSource: [],
       firstIn: true,
@@ -22,6 +23,10 @@ class ClusterBroker extends React.Component {
   }
 
   componentWillMount = () => {
+    const { filter } = this.state
+    if (filter.length > 0) {
+      this.search(filter)
+    }
   }
 
   search = async (filter) => {
@@ -118,7 +123,7 @@ class ClusterBroker extends React.Component {
             style={{
               // border: '1px solid #e8e8e8',
               width: 900,
-              display: dataSource.length > 0 ? 'block' : 'none',
+              display: dataSource.length > 0 || loading === true ? 'block' : 'none',
               backgroundColor: 'white',
               borderRadius: 4,
               margin: '0 auto',
@@ -128,12 +133,34 @@ class ClusterBroker extends React.Component {
               showQuickJumper: true,
             }}
             renderItem={(item) => {
-              const target1 = _.find(item.property, { predicate_label: '' })
-              const target2 = _.find(item.property, { predicate_label: '分类' })
+              let target1 = {
+                object: '',
+              }
+              let target2
+              let target3
+              for (const i of item.property) {
+                if (i.type === 'image' || i.object.indexOf('getjpg') > 0) {
+                  if (!target3) {
+                    target3 = i
+                  }
+                }
+                if (i.predicate_label === '') {
+                  target1 = i
+                }
+                if (i.predicate_label === '分类') {
+                  target2 = i
+                }
+              }
               return (
                 <List.Item style={{ padding: 20 }}>
                   <List.Item.Meta
-                    avatar={<Avatar size={64}>{item.label.substr(0, 1)}</Avatar>}
+                    avatar={target3 ? (
+                      <Avatar size={64} src={target3.object} />
+                    ) : (
+                      <Avatar size={64}>
+                        {item.label.substr(0, 1)}
+                      </Avatar>
+                    )}
                     title={(
                       <a
                         href="javascript:;"
@@ -162,7 +189,11 @@ class ClusterBroker extends React.Component {
                         >
                           {target2 ? '分类' : '属性'}
                         </span>
-                        <span>{target2 ? target2.object_label : target1.object}</span>
+                        <span>
+                          {target2
+                            ? target2.object_label : target1.object
+                              ? target1.object : target1.object_label}
+                        </span>
                       </span>
                     )}
                   />
@@ -175,7 +206,7 @@ class ClusterBroker extends React.Component {
           />
         </div>
         <Empty
-          style={{ marginTop: 200, display: dataSource.length === 0 && firstIn === false ? 'block' : 'none' }}
+          style={{ marginTop: 200, display: dataSource.length === 0 && firstIn === false && loading === false ? 'block' : 'none' }}
           description="没有结果"
         />
         <div
