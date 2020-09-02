@@ -27,9 +27,9 @@ const columns = [{
   align: 'left',
   render: (text, record) => {
     const type = record.predicate ? record.predicate.split('#')[1] : ''
-    if (type === 'image' || record.object.indexOf('getjpg') > 0) {
+    if (type === 'image' || record.object.indexOf('getjpg') > -1 || record.object.indexOf('getpng') > -1) {
       return <img style={{ maxHeight: 300 }} alt="" src={record.object} />
-    } else if (type === 'category') {
+    } else if (type === 'category' || (record.object.indexOf('http') > -1 && record.object_label.length > 0)) {
       return <span style={{ color: '#24b0e6' }}>{record.object_label}</span>
     } else {
       return <span style={{ color: '#24b0e6' }}>{record.object}</span>
@@ -127,7 +127,7 @@ class FirstGraph extends React.Component {
     const imgList = []
     array.forEach((e) => {
       if (e.predicate_label !== '学术论文') {
-        if (e.type === 'image' || e.object.indexOf('getjpg') > 0) {
+        if (e.type === 'image' || e.object.indexOf('getjpg') > 0 || e.object.indexOf('getpng') > 0) {
           imgList.push(e)
         } else {
           result.push(e)
@@ -252,6 +252,7 @@ class FirstGraph extends React.Component {
               <Cascader
                 options={options}
                 value={filter}
+                rows={4}
                 onChange={value => this.setState({ filter: value })}
                 allowClear={false}
               />

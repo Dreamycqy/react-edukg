@@ -139,7 +139,7 @@ class ClusterBroker extends React.Component {
               let target2
               let target3
               for (const i of item.property) {
-                if (i.type === 'image' || i.object.indexOf('getjpg') > 0) {
+                if (i.type === 'image' || i.object.indexOf('getjpg') > 0 || i.object.indexOf('getpng') > 0) {
                   if (!target3) {
                     target3 = i
                   }
