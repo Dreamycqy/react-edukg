@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, AutoComplete, Input, List, Empty, Avatar } from 'antd'
+import { Button, AutoComplete, Input, List, Empty, Avatar, Select } from 'antd'
 import { connect } from 'dva'
 // import _ from 'lodash'
 import { routerRedux } from 'dva/router'
@@ -9,6 +9,7 @@ import kgIcon from '@/assets/kgIcon.png'
 // import colorList from '@/constants/colorList'
 
 let localCounter = 0
+const { Option } = Select
 
 @connect()
 class ClusterBroker extends React.Component {
@@ -18,7 +19,9 @@ class ClusterBroker extends React.Component {
       filter: getUrlParams().filter || '',
       loading: false,
       dataSource: [],
+      oriSource: [],
       firstIn: true,
+      selectValue: 'all',
     }
   }
 
@@ -37,6 +40,7 @@ class ClusterBroker extends React.Component {
     if (data.data) {
       this.setState({
         dataSource: data.data,
+        oriSource: data.data,
       })
     }
     this.setState({ loading: false })
@@ -68,14 +72,32 @@ class ClusterBroker extends React.Component {
     }))
   }
 
+  handleFilter = (value) => {
+    const { oriSource } = this.state
+    this.setState({ selectValue: value })
+    if (value === 'all') {
+      this.setState({ dataSource: oriSource })
+    } else if (value === 'instance') {
+      this.setState({ dataSource: oriSource.filter((e) => { return e.type === 'instance' }) })
+    } else {
+      this.setState({ dataSource: oriSource.filter((e) => { return e.type !== 'instance' }) })
+    }
+  }
+
   render() {
     const {
-      dataSource, filter, loading, firstIn,
+      dataSource, filter, loading, firstIn, selectValue,
     } = this.state
+    const rtn = dataSource.map(i => ({ raw: i, len: i.label.length }))
+      .sort((p, n) => p.len - n.len)
+      .map(i => i.raw)
+    // const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
+    //   .sort((p, n) => n.indexOf(filter) - p.indexOf(filter))
+    //   .map(i => i.raw)
     return (
       <div style={{ padding: '20px 0', minWidth: 1200 }}>
         <div style={{ marginBottom: 20, textAlign: 'center' }}>
-          <div style={{ height: 120, width: 900, display: 'inline-block' }}>
+          <div style={{ height: 80, width: 900, display: 'inline-block' }}>
             <AutoComplete
               size="large"
               style={{
@@ -115,10 +137,23 @@ class ClusterBroker extends React.Component {
               搜索
             </Button>
           </div>
+          <div
+            style={{
+              display: firstIn === true ? 'none' : 'inline-block',
+              width: 900,
+              textAlign: 'left',
+            }}
+          >
+            <Select value={selectValue} style={{ width: 200 }} onChange={value => this.handleFilter(value)}>
+              <Option key="all" value="all">全部</Option>
+              <Option key="instance" value="instance">实体</Option>
+              <Option key="class" value="class">概念</Option>
+            </Select>
+          </div>
           <List
             itemLayout="vertical"
             size="large"
-            dataSource={dataSource}
+            dataSource={rtn}
             loading={loading}
             style={{
               // border: '1px solid #e8e8e8',
@@ -133,9 +168,6 @@ class ClusterBroker extends React.Component {
               showQuickJumper: true,
             }}
             renderItem={(item) => {
-              let target1 = {
-                object: '',
-              }
               let target2
               let target3
               for (const i of item.property) {
@@ -144,10 +176,7 @@ class ClusterBroker extends React.Component {
                     target3 = i
                   }
                 }
-                if (i.predicate_label === '') {
-                  target1 = i
-                }
-                if (i.predicate_label === '分类') {
+                if (i.predicate_label === '分类' && i.object_label.length > 0) {
                   target2 = i
                 }
               }
@@ -181,18 +210,19 @@ class ClusterBroker extends React.Component {
                             display: 'inline-block',
                             textAlign: 'center',
                             border: '1px solid',
-                            backgroundColor: target2 ? '#24b0e6' : '#28d100',
-                            borderColor: target2 ? '#24b0e6' : '#28d100',
+                            backgroundColor: item.type === 'instance' ? '#24b0e6' : '#28d100',
+                            borderColor: item.type === 'instance' ? '#24b0e6' : '#28d100',
                             borderRadius: 4,
                             marginRight: 12,
                           }}
                         >
-                          {target2 ? '分类' : '属性'}
+                          {item.type === 'instance' ? '实体' : '概念'}
                         </span>
                         <span>
-                          {target2
-                            ? target2.object_label : target1.object
-                              ? target1.object : target1.object_label}
+                          {target2 ? '所属分类：' : ''}
+                        </span>
+                        <span>
+                          {target2 ? target2.object_label.length > 0 ? target2.object_label : target2.object : ''}
                         </span>
                       </span>
                     )}
