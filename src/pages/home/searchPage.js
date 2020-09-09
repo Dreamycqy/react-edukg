@@ -1,12 +1,16 @@
 import React from 'react'
-import { Button, AutoComplete, Input, List, Empty, Avatar, Select } from 'antd'
+import { Button, AutoComplete, Input, List, Empty, Avatar, Select, Divider } from 'antd'
 import { connect } from 'dva'
-// import _ from 'lodash'
 import { routerRedux } from 'dva/router'
 import { newSearch } from '@/services/edukg'
 import { getUrlParams } from '@/utils/common'
 import kgIcon from '@/assets/kgIcon.png'
-// import colorList from '@/constants/colorList'
+import GrapeImg from '@/assets/grape.png'
+import noteImg from '@/assets/eduIcon/note.png'
+import phyImg from '@/assets/eduIcon/phy.png'
+import chemImg from '@/assets/eduIcon/chem.png'
+import bioImg from '@/assets/eduIcon/bio.png'
+import geoImg from '@/assets/eduIcon/geo.png'
 
 let localCounter = 0
 const { Option } = Select
@@ -32,14 +36,32 @@ class ClusterBroker extends React.Component {
     }
   }
 
+  checkAvatar = (uri) => {
+    if (uri.indexOf('geo#') > -1) {
+      return geoImg
+    } else if (uri.indexOf('biology#') > -1) {
+      return bioImg
+    } else if (uri.indexOf('physics#') > -1) {
+      return phyImg
+    } else if (uri.indexOf('chemistry#') > -1) {
+      return chemImg
+    } else {
+      return noteImg
+    }
+  }
+
   search = async (filter) => {
     this.setState({ loading: true, filter, firstIn: false })
     const data = await newSearch({
       searchKey: filter,
     })
     if (data.data) {
+      if (this.state.selectValue === 'all') {
+        this.setState({ dataSource: data.data })
+      } else {
+        this.setState({ dataSource: data.data.filter((e) => { return e.type === this.state.selectValue }) })
+      }
       this.setState({
-        dataSource: data.data,
         oriSource: data.data,
       })
     }
@@ -63,45 +85,46 @@ class ClusterBroker extends React.Component {
     this.setState({ filter: value })
   }
 
-  handleJump = (uri) => {
-    this.props.dispatch(routerRedux.push({
-      pathname: '/newGraph',
-      query: {
-        uri: escape(uri),
-      },
-    }))
-  }
-
   handleFilter = (value) => {
     const { oriSource } = this.state
     this.setState({ selectValue: value })
     if (value === 'all') {
       this.setState({ dataSource: oriSource })
-    } else if (value === 'instance') {
-      this.setState({ dataSource: oriSource.filter((e) => { return e.type === 'instance' }) })
     } else {
-      this.setState({ dataSource: oriSource.filter((e) => { return e.type !== 'instance' }) })
+      this.setState({ dataSource: oriSource.filter((e) => { return e.type === value }) })
     }
+  }
+
+  handleJumpGraph = () => {
+    this.props.dispatch(routerRedux.push({
+      pathname: '/classGraph',
+      query: {
+      },
+    }))
   }
 
   render() {
     const {
       dataSource, filter, loading, firstIn, selectValue,
     } = this.state
-    const rtn = dataSource.map(i => ({ raw: i, len: i.label.length }))
+    const rtn1 = dataSource.map(i => ({ raw: i, len: i.label }))
+      .sort((p, n) => p.len.indexOf(filter) - n.len.indexOf(filter))
+      .map(i => i.raw)
+    const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
       .sort((p, n) => p.len - n.len)
       .map(i => i.raw)
-    // const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
-    //   .sort((p, n) => n.indexOf(filter) - p.indexOf(filter))
-    //   .map(i => i.raw)
     return (
-      <div style={{ padding: '20px 0', minWidth: 1200 }}>
-        <div style={{ marginBottom: 20, textAlign: 'center' }}>
-          <div style={{ height: 80, width: 900, display: 'inline-block' }}>
+      <div style={{ margin: '0 auto', width: 1200, minHeight: 800, backgroundColor: '#ffffffee', paddingTop: 20 }}>
+        <div style={{ marginBottom: '0 auto 20px', textAlign: 'center' }}>
+          <div style={{ height: 70, width: 900, display: 'inline-block' }}>
+            <div style={{ height: 60, display: 'inline-block', float: 'left' }}>
+              <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
+              <div style={{ fontSize: 38, float: 'left', color: '#6e72df', fontWeight: 700 }}>SEKG</div>
+            </div>
             <AutoComplete
               size="large"
               style={{
-                width: 720, float: 'left',
+                width: 520, float: 'left', marginLeft: 30
               }}
               dataSource={[]}
               value={filter}
@@ -120,6 +143,7 @@ class ClusterBroker extends React.Component {
                   height: 60,
                   lineHeight: '60px',
                   fontSize: 24,
+                  backgroundColor: '#fff',
                 }}
               />
             </AutoComplete>
@@ -137,6 +161,16 @@ class ClusterBroker extends React.Component {
               搜索
             </Button>
           </div>
+          <br />
+          <div style={{ height: 30, width: 900, display: 'inline-block' }}>
+            例：
+            <a href="javascript:;" onClick={() => this.search('亚洲')}>亚洲</a>
+            <Divider type="vertical" />
+            <a href="javascript:;" onClick={() => this.search('法拉第电磁感应定律')}>法拉第电磁感应定律</a>
+            <Divider type="vertical" />
+            <a href="javascript:;" onClick={() => this.search('动能、势能的大小变化及判断')}>动能、势能的大小变化及判断</a>
+          </div>
+          <br />
           <div
             style={{
               display: firstIn === true ? 'none' : 'inline-block',
@@ -144,7 +178,10 @@ class ClusterBroker extends React.Component {
               textAlign: 'left',
             }}
           >
-            <Select value={selectValue} style={{ width: 200 }} onChange={value => this.handleFilter(value)}>
+            <Select
+              value={selectValue} style={{ width: 200 }}
+              onChange={value => this.handleFilter(value)}
+            >
               <Option key="all" value="all">全部</Option>
               <Option key="instance" value="instance">实体</Option>
               <Option key="class" value="class">概念</Option>
@@ -159,10 +196,11 @@ class ClusterBroker extends React.Component {
               // border: '1px solid #e8e8e8',
               width: 900,
               display: dataSource.length > 0 || loading === true ? 'block' : 'none',
-              backgroundColor: 'white',
+              backgroundColor: '#ffffffa6',
               borderRadius: 4,
               margin: '0 auto',
               textAlign: 'left',
+              paddingBottom: 30,
             }}
             pagination={{
               showQuickJumper: true,
@@ -186,16 +224,13 @@ class ClusterBroker extends React.Component {
                     avatar={target3 ? (
                       <Avatar size={64} src={target3.object} />
                     ) : (
-                      <Avatar size={64}>
-                        {item.label.substr(0, 1)}
-                      </Avatar>
+                      <Avatar size={64} src={this.checkAvatar(item.uri)} />
                     )}
                     title={(
                       <a
                         href="javascript:;"
                         onClick={() => {
-                          // this.handleJump(item.uri)
-                          window.open(`/newGraph?uri=${escape(item.uri)}`)
+                          window.open(`/newGraph?uri=${escape(item.uri)}&type=${item.type}`)
                         }}
                       >
                         {this.handleHighlight(item.label, filter)}
@@ -244,7 +279,7 @@ class ClusterBroker extends React.Component {
         >
           <div style={{ display: 'inline-block' }}>
             <img src={kgIcon} alt="" width="200px" style={{ float: 'left' }} />
-            <div style={{ width: 560, overflow: 'hidden', paddingTop: 30, paddingLeft: 50 }}>
+            <div style={{ width: 560, overflow: 'hidden', paddingTop: 10, paddingLeft: 50 }}>
               科学教育知识图谱是以中国的科学课程标准、
               美国的《Next Generation Science Standards》为基础，
               结合基础教育知识图谱edukg中的内容构建而成的面向科学教育的知识图谱。
@@ -255,6 +290,13 @@ class ClusterBroker extends React.Component {
               为充分利用互联网的学习资源，本图谱将科普中国等多个网站的图文、视频、学术论文等资源与知识点进行链接，
               实现知识的互联共通。
             </div>
+            <Button
+              style={{ marginTop: 20, marginLeft: 10 }}
+              type="primary" href="javascript:;"
+              onClick={() => this.handleJumpGraph()}
+            >
+              浏览图谱
+            </Button>
           </div>
         </div>
       </div>

@@ -53,16 +53,16 @@ export default class GraphChart extends React.Component {
       if (_.find(newNodes, { name }) !== undefined) {
         _.find(newNodes, { name }).open = false
         links.forEach((e) => {
-          if (e.source === name) {
-            _.find(newNodes, { name: e.target }).show = false
+          if (e.target === name) {
+            _.find(newNodes, { name: e.source }).show = false
           }
         })
       }
     } else if (_.find(newNodes, { name }) !== undefined) {
       _.find(newNodes, { name }).open = true
       links.forEach((e) => {
-        if (e.source === name) {
-          _.find(newNodes, { name: e.target }).show = true
+        if (e.target === name) {
+          _.find(newNodes, { name: e.source }).show = true
         }
       })
     }
@@ -71,14 +71,16 @@ export default class GraphChart extends React.Component {
 
   jumpToGraph = (param) => {
     const { data } = param
-    const { category, uri } = data
+    const { category, uri, name, type } = data
     if (category === '0') {
       return
     }
     if (category !== '1') {
-      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
-    } else if (data.symbol === 'rect') {
-      window.open(`newGraph?uri=${encodeURIComponent(uri)}`)
+      this.props.handleExpandGraph({
+        uri,
+        name,
+        type,
+      })
     }
   }
 

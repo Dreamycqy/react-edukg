@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Divider } from 'antd'
+import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal } from 'antd'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -10,10 +10,6 @@ import { getUrlParams } from '@/utils/common'
 import Chart from '@/components/charts/graph'
 import { newResult } from '@/services/edukg'
 import GrapeImg from '@/assets/grape.png'
-import kpchinaTitle from '@/assets/kpchina_title.png'
-import baiduTitle from '@/assets/baidu_title.png'
-import kepuTitle from '@/assets/kepu_title.jpg'
-import kpsourceTitle from '@/assets/kpsource_title.jpg'
 import Styles from './style.less'
 
 const { Link } = Anchor
@@ -90,7 +86,7 @@ class FirstGraph extends React.Component {
       forcename: '',
       dataSource: [],
       loading: false,
-      uri: unescape(getUrlParams().uri || ''),
+      uri: 'http://webprotege.stanford.edu/R816WDEyFZ6LnUcUbMsDuzR',
       filter: ['score', 'desc'],
       searchKey: '',
       imgList: [],
@@ -102,10 +98,10 @@ class FirstGraph extends React.Component {
       modalVisible: false,
       graphHistory: [],
       selectGraph: {
-        uri: unescape(getUrlParams().uri || ''),
-        name: '',
+        uri: 'http://webprotege.stanford.edu/R816WDEyFZ6LnUcUbMsDuzR',
+        name: '科学',
       },
-      type: getUrlParams().type,
+      type: '概念',
       kgLarger: false,
     }
   }
@@ -406,7 +402,7 @@ class FirstGraph extends React.Component {
       result.push(
         <div>
           <a href="javascript:;" onClick={() => this.chooseImg(_.findIndex(imgList, { object: e.object }))}>
-            <img style={{ border: '1px solid #e8e8e8', margin: 20 }} src={e.object} alt="" height="220px" width="220px" />
+            <img style={{ border: '1px solid #e8e8e8', margin: 10 }} src={e.object} alt="" height="220px" width="220px" />
           </a>
         </div>,
       )
@@ -428,23 +424,8 @@ class FirstGraph extends React.Component {
   renderCard = (list) => {
     const result = []
     for (const obj in list) { // eslint-disable-line
-      const src = ''
-      if (obj === '科普中国资源') {
-        src = kpchinaTitle
-      } else if (obj === '科学百科词条') {
-        src = baiduTitle
-      } else if (obj.indexOf('中国科普博览') > -1) {
-        src = kepuTitle
-      } else if (obj.indexOf('科普活动资源服务平台') > -1) {
-        src = kpsourceTitle
-      }
       result.push(
-        <Card
-          id={obj}
-          className={Styles.myCard}
-          style={{ margin: 20 }}
-          title={<span>{src.length > 0 ? <img alt="" src={src} height="30px" width="100px" /> : null}&nbsp;&nbsp;&nbsp;&nbsp;{obj}</span>}
-        >
+        <Card className={Styles.myCard} id={obj} style={{ margin: 10 }} title={obj}>
           <Table
             columns={columnsResource}
             size="small"
@@ -501,28 +482,13 @@ class FirstGraph extends React.Component {
       imgList, wikiLinks, selectImg, modalVisible, graph, type, graphHistory,
     } = this.state
     return (
-      <div style={{ paddingTop: 10, overflow: 'hidden', minWidth: 1300, backgroundColor: '#f2f6f7e6' }}>
-        <div style={{ float: 'left', width: 250 }}>
-          <div style={{ height: 60, marginLeft: 30, marginTop: 6 }}>
-            <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
-            <div style={{ fontSize: 38, float: 'left', color: '#6e72df', fontWeight: 700 }}>SEKG</div>
-          </div>
-          <Anchor onClick={this.handleClick} className={Styles.anchor}>
-            {dataSource.length > 0
-              ? <Link href="#components-anchor-props" style={{ margin: 10 }} title="知识属性" />
-              : null
-            }
-            <Link href="#components-anchor-graph" style={{ margin: 10 }} title="关系图" />
-            {imgList.length > 0
-              ? <Link href="#components-anchor-pics" style={{ margin: 10 }} title="相关图片" />
-              : null
-            }
-            {this.handleAnchor(wikiLinks)}
-            <Link href="#components-anchor-pages" style={{ margin: 10 }} title="相关论文" />
-          </Anchor>
-        </div>
-        <div style={{ overflow: 'hidden' }}>
-          <div style={{ height: 60, margin: '10px 0 0 20px' }}>
+      <div style={{ paddingTop: 10, overflow: 'hidden', minWidth: 1300, backgroundColor: '#ffffffe9' }}>
+        <div style={{ height: 80, margin: '10px 0 0 20px', textAlign: 'center' }}>
+          <div style={{ display: 'inline-block' }}>
+            <div style={{ height: 60, marginLeft: 30, marginTop: 6, float: 'left' }}>
+              <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
+              <div style={{ fontSize: 38, float: 'left', color: '#6e72df', fontWeight: 700 }}>SEKG</div>
+            </div>
             <Input
               value={searchKey}
               onChange={e => this.setState({ searchKey: e.target.value })}
@@ -531,18 +497,21 @@ class FirstGraph extends React.Component {
               style={{
                 borderBottomRightRadius: 0,
                 borderTopRightRadius: 0,
-                width: '70%',
+                width: 520,
                 height: 50,
                 lineHeight: '50px',
                 fontSize: 24,
                 float: 'left',
+                marginTop: 10,
+                marginLeft: 20,
               }}
             />
             <Button
               style={{
                 float: 'left',
                 height: 50,
-                width: '12%',
+                width: 180,
+                marginTop: 10,
                 borderBottomLeftRadius: 0,
                 borderTopLeftRadius: 0,
               }}
@@ -552,23 +521,14 @@ class FirstGraph extends React.Component {
               搜索
             </Button>
           </div>
-          <div>
-            <div style={{ marginLeft: 30, fontSize: 20, fontWeight: 700 }}>
-              <span style={{ fontSize: 14, fontWeight: 400 }}>
-                <a href="javascript:;"><Icon type="profile" /></a>
-                <span style={{ margin: '0 10px' }}>分类：</span>
-                {dataSource.filter((e) => { return e.predicate_label === '分类' }).map((e, index) => {
-                  if (index < dataSource.filter((e) => { return e.predicate_label === '分类' }).length - 1) {
-                    return <span>{e.object_label}<Divider type="vertical" style={{ backgroundColor: '#bbb' }} /></span>
-                  } else {
-                    return <span>{e.object_label}</span>
-                  }
-                })}
-              </span>
-              <br />
+        </div>
+        <div style={{ float: 'left', width: '60%', padding: 10 }}>
+          <Card
+            className={Styles.myCard}
+            id="components-anchor-graph"
+            title={(<div style={{ fontSize: 20, fontWeight: 700 }}>
               <span
                 style={{
-                  marginTop: 10,
                   color: 'white',
                   padding: '2px 20px',
                   display: 'inline-block',
@@ -583,8 +543,37 @@ class FirstGraph extends React.Component {
                 {type === 'instance' ? '实体' : '概念'}
               </span>
               <span style={{ color: '#24b0e6' }}>{forcename}</span>
-            </div>
-            <Card className={Styles.myCard} id="components-anchor-props" style={{ display: dataSource.length === 0 ? 'none' : 'block', margin: 20 }} bordered={false}>
+            </div>)}
+          >
+            <Spin spinning={loading}>
+              <div style={{ float: 'left', width: 200, borderRight: '1px solid #e8e8e8', height: 600, overflowY: 'scroll' }}>
+                {graphHistory.map((e, index) => (
+                  <div style={{ padding: 6 }}>
+                    <a
+                      href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
+                      onClick={() => this.handleExpandGraph(e)}
+                    >
+                      {index === graphHistory.length - 1
+                        ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
+                        : <div style={{ width: 24, display: 'inline-block' }} />
+                      }
+                      {e.name}
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <div style={{ height: 600, overflow: 'hidden' }}>
+                <Chart
+                  graph={graph} forcename={forcename}
+                  handleExpandGraph={this.handleExpandGraph}
+                />
+              </div>
+            </Spin>
+          </Card>
+        </div>
+        <div style={{ overflow: 'hidden' }}>
+          <div>
+            <Card className={Styles.myCard} id="components-anchor-props" style={{ display: dataSource.length === 0 ? 'none' : 'block', margin: 10 }} bordered={false}>
               <Table
                 dataSource={dataSource}
                 columns={columns}
@@ -596,48 +585,7 @@ class FirstGraph extends React.Component {
                 rowKey={record => record.propertyname}
               />
             </Card>
-            <Card
-              className={Styles.myCard}
-              id="components-anchor-graph"
-              title={<span><Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />关系图</span>}
-              bordered={false}
-              style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20 }}
-              extra={(
-                <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
-              )}
-            >
-              <Spin spinning={loading}>
-                <div style={{ height: kgLarger === true ? 600 : 400 }}>
-                  <div style={{ float: 'left', width: 200, borderRight: '1px solid #e8e8e8', height: '100%', overflowY: 'scroll' }}>
-                    {graphHistory.map((e, index) => (
-                      <div style={{ padding: 6 }}>
-                        <a
-                          href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
-                          onClick={() => this.handleExpandGraph(e)}
-                        >
-                          {index === graphHistory.length - 1
-                            ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-                            : <div style={{ width: 24, display: 'inline-block' }} />
-                          }
-                          {e.name}
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ height: kgLarger === true ? 600 : 400, overflow: 'hidden' }}>
-                    <Chart
-                      graph={graph} forcename={forcename}
-                      handleExpandGraph={this.handleExpandGraph}
-                    />
-                  </div>
-                </div>
-              </Spin>
-            </Card>
-            <Card
-              className={Styles.myCard} bordered={false}
-              style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
-              id="components-anchor-pics" title={<span><Icon type="picture" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />相关图片</span>}
-            >
+            <Card className={Styles.myCard} style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 10 }} id="components-anchor-pics" title="相关图片">
               <Spin spinning={loading}>
                 <div style={{ height: 280 }}>
                   <Slider
@@ -653,9 +601,8 @@ class FirstGraph extends React.Component {
             {this.renderCard(wikiLinks)}
             <Card
               className={Styles.myCard}
-              style={{ margin: 20 }}
-              title={<span><Icon type="read" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />相关论文</span>}
-              bordered={false}
+              style={{ margin: 10 }}
+              title="相关论文"
               id="components-anchor-pages"
               extra={(
                 <Cascader

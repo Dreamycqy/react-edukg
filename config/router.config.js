@@ -15,6 +15,10 @@ export default [
         path: 'newGraph',
         component: './graph/newGraph',
       },
+      {
+        path: 'classGraph',
+        component: './graph/classGraph',
+      },
     ],
   },
 ]

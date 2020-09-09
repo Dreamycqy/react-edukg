@@ -7,6 +7,7 @@ import en_GB from 'antd/lib/locale-provider/en_GB'
 import menuList from '@/constants/menuList'
 import logoFooter from '@/assets/logofooter.png'
 import qrcode from '@/assets/qrcode.png'
+import backGroundImg from '@/assets/14624.jpg'
 
 const {
   Header, Footer, Content,
@@ -67,7 +68,7 @@ class MainLayout extends React.Component {
               <Link to="">SEKG 科学教育图谱</Link>
             </div>
           </Header>
-          <Content style={{ backgroundColor: '#fff', minHeight: 800, marginTop: 40 }}>
+          <Content style={{ background: `url(${backGroundImg}) top`, backgroundSize: '120%', minHeight: 800, marginTop: 40 }}>
             {this.props.children}
           </Content>
           <Footer
