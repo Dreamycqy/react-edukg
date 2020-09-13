@@ -38,16 +38,11 @@ const columns = [{
     if (typeNew === 'image' || record.object.indexOf('getjpg') > -1 || record.object.indexOf('getpng') > -1) {
       return <img style={{ maxHeight: 300 }} alt="" src={record.object} />
     } else if (typeNew === 'category' || (record.object.indexOf('http') > -1 && record.object_label.length > 0)) {
-      return <span style={{ color: '#24b0e6' }}>{record.object_label}</span>
+      return <span style={{ color: '#24b0e6' }}>{record.labelList.join('， ')}</span>
     } else {
       return <span style={{ color: '#24b0e6' }}>{record.object}</span>
     }
   },
-}]
-
-const columnsResource = [{
-  title: '标题',
-  dataIndex: 'object_label',
 }]
 
 const options = [{
@@ -158,6 +153,8 @@ class FirstGraph extends React.Component {
           symbolSize: index === graphHistory.length - 1 ? 60 : 40, // 节点大小
           uri: e.uri,
           symbol: 'circle',
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
           draggable: true,
           type: e.type,
           label: {
@@ -241,6 +238,8 @@ class FirstGraph extends React.Component {
           uri: '',
           open: false,
           symbol: 'circle',
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
           draggable: true,
           label: {
             normal: {
@@ -275,6 +274,8 @@ class FirstGraph extends React.Component {
             uri: e.object || e.subject,
             show: false,
             symbol: 'circle',
+            edgeSymbol: ['circle', 'arrow'],
+            edgeSymbolSize: [4, 10],
             draggable: true,
             type,
             label: {
@@ -312,6 +313,8 @@ class FirstGraph extends React.Component {
             uri: e.object || e.subject,
             show: false,
             symbol: 'circle',
+            edgeSymbol: ['circle', 'arrow'],
+            edgeSymbolSize: [4, 10],
             draggable: true,
             type,
             label: {
@@ -353,7 +356,15 @@ class FirstGraph extends React.Component {
         if (e.type === 'image' || e.object.indexOf('getjpg') > 0 || e.object.indexOf('getpng') > 0) {
           imgList.push(e)
         } else {
-          result.push(e)
+          const target = _.find(result, { predicate_label: e.predicate_label })
+          if (!target) {
+            result.push({
+              ...e,
+              labelList: [e.object_label],
+            })
+          } else {
+            target.labelList.push(e.object_label)
+          }
         }
       }
     })
@@ -406,7 +417,7 @@ class FirstGraph extends React.Component {
       result.push(
         <div>
           <a href="javascript:;" onClick={() => this.chooseImg(_.findIndex(imgList, { object: e.object }))}>
-            <img style={{ border: '1px solid #e8e8e8', margin: 20 }} src={e.object} alt="" height="220px" width="220px" />
+            <img style={{ border: '1px solid #e8e8e8', margin: 20, objectFit: 'cover' }} src={e.object} alt="" height="220px" width="220px" />
           </a>
         </div>,
       )
@@ -428,7 +439,7 @@ class FirstGraph extends React.Component {
   renderCard = (list) => {
     const result = []
     for (const obj in list) { // eslint-disable-line
-      const src = ''
+      let src = ''
       if (obj === '科普中国资源') {
         src = kpchinaTitle
       } else if (obj === '科学百科词条') {
@@ -443,20 +454,75 @@ class FirstGraph extends React.Component {
           id={obj}
           className={Styles.myCard}
           style={{ margin: 20 }}
-          title={<span>{src.length > 0 ? <img alt="" src={src} height="30px" width="100px" /> : null}&nbsp;&nbsp;&nbsp;&nbsp;{obj}</span>}
+          title={(
+            <span>
+              {src.length > 0 ? <img alt="" src={src} height="30px" width="100px" /> : null}
+              &nbsp;&nbsp;&nbsp;&nbsp;
+              {obj}
+            </span>
+          )}
         >
-          <Table
-            columns={columnsResource}
+          <List
             size="small"
-            className={Styles.myTable}
-            showHeader={false}
             pagination={false}
+            itemLayout="vertical"
             expandedRowRender={record => (
               <div style={{ margin: 0 }}>
                 {this.renderExpand(record.propety)}
               </div>
             )}
             dataSource={list[obj]}
+            renderItem={(item) => {
+              const imgTarget = _.find(item.propety, { predicate_label: '资源图片' })
+              return (
+                <List.Item
+                  style={{ padding: 10 }}
+                  extra={(
+                    <img
+                      width="240px"
+                      alt="logo"
+                      style={{ display: imgTarget ? 'inline-block' : 'none' }}
+                      src={imgTarget ? imgTarget.object : ''}
+                    />
+                  )}
+                >
+                  <List.Item.Meta
+                    title={(
+                      <a
+                        href="javascript:;"
+                        onClick={() => { window.open(_.find(item.propety, { predicate_label: '资源链接' }).object) }}
+                      >
+                        { _.find(item.propety, { predicate_label: '资源标题' }).object }
+                      </a>
+                    )}
+                    description={(
+                      <div>
+                        <Icon
+                          type="read"
+                          style={{ marginRight: 8, color: '#24b0e6' }}
+                        />
+                        资源类别：
+                        {_.find(item.propety, { predicate_label: '资源类别' }).object}
+                      </div>
+                    )}
+                  />
+                  <div>
+                    {item.propety.filter((e) => {
+                      return (e.predicate_label !== '资源标题' && e.predicate_label !== '资源类别' && e.predicate_label !== '资源链接' && e.predicate_label !== '资源图片')
+                    }).map(e => (
+                      <div>
+                        <div style={{ width: 100, textAlign: 'right', display: 'inline-block' }}>
+                          {obj === '科学百科词条' ? e.predicate_label.split('百科infobox_')[1] : e.predicate_label}
+                          ：
+                          {' '}
+                        </div>
+                        <span>{e.object}</span>
+                      </div>
+                    ))}
+                  </div>
+                </List.Item>
+              )
+            }}
           />
         </Card>,
       )
@@ -558,8 +624,13 @@ class FirstGraph extends React.Component {
                 <a href="javascript:;"><Icon type="profile" /></a>
                 <span style={{ margin: '0 10px' }}>分类：</span>
                 {dataSource.filter((e) => { return e.predicate_label === '分类' }).map((e, index) => {
-                  if (index < dataSource.filter((e) => { return e.predicate_label === '分类' }).length - 1) {
-                    return <span>{e.object_label}<Divider type="vertical" style={{ backgroundColor: '#bbb' }} /></span>
+                  if (index < dataSource.filter((j) => { return j.predicate_label === '分类' }).length - 1) {
+                    return (
+                      <span>
+                        {e.object_label}
+                        <Divider type="vertical" style={{ backgroundColor: '#bbb' }} />
+                      </span>
+                    )
                   } else {
                     return <span>{e.object_label}</span>
                   }
@@ -599,7 +670,12 @@ class FirstGraph extends React.Component {
             <Card
               className={Styles.myCard}
               id="components-anchor-graph"
-              title={<span><Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />关系图</span>}
+              title={(
+                <span>
+                  <Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  关系图
+                </span>
+)}
               bordered={false}
               style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20 }}
               extra={(
@@ -636,7 +712,12 @@ class FirstGraph extends React.Component {
             <Card
               className={Styles.myCard} bordered={false}
               style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
-              id="components-anchor-pics" title={<span><Icon type="picture" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />相关图片</span>}
+              id="components-anchor-pics" title={(
+                <span>
+                  <Icon type="picture" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  相关图片
+                </span>
+)}
             >
               <Spin spinning={loading}>
                 <div style={{ height: 280 }}>
@@ -654,7 +735,12 @@ class FirstGraph extends React.Component {
             <Card
               className={Styles.myCard}
               style={{ margin: 20 }}
-              title={<span><Icon type="read" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />相关论文</span>}
+              title={(
+                <span>
+                  <Icon type="read" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  相关论文
+                </span>
+)}
               bordered={false}
               id="components-anchor-pages"
               extra={(

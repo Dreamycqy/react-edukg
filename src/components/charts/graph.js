@@ -15,9 +15,7 @@ export default class GraphChart extends React.Component {
     const { graph, forcename } = this.props
     try {
       this.instance = this.renderChart(this.dom, graph, forcename, this.instance)
-      console.log(graph)
       resizeListener(this.dom, () => {
-        console.log(graph)
         this.instance = this.renderChart(this.dom, graph, forcename, this.instance, true)
       })
     } catch (e) {
@@ -117,7 +115,11 @@ export default class GraphChart extends React.Component {
         series: [{
           type: 'graph',
           layout: 'force',
+          focusNodeAdjacency: true,
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
           name: forcename,
+          roam: true,
           force: {
             initLayout: 'circular',
             repulsion: 50,
@@ -179,6 +181,7 @@ export default class GraphChart extends React.Component {
     myChart.on('dblclick', (params) => {
       that.openOrFold(params, graph)
     })
+    console.log(myChart._chartsViews[0]._symbolDraw._data._itemLayouts)
     return myChart
   }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, AutoComplete, Input, List, Empty, Avatar, Select, Divider } from 'antd'
+import { Button, AutoComplete, Input, List, Empty, Avatar, Checkbox, Divider } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
 import { newSearch } from '@/services/edukg'
@@ -13,7 +13,10 @@ import bioImg from '@/assets/eduIcon/bio.png'
 import geoImg from '@/assets/eduIcon/geo.png'
 
 let localCounter = 0
-const { Option } = Select
+const plainOptions = [
+  { label: '实体', value: 'instance' },
+  { label: '概念', value: 'class' },
+]
 
 @connect()
 class ClusterBroker extends React.Component {
@@ -25,7 +28,7 @@ class ClusterBroker extends React.Component {
       dataSource: [],
       oriSource: [],
       firstIn: true,
-      selectValue: 'all',
+      selectValue: ['instance', 'class'],
     }
   }
 
@@ -51,15 +54,18 @@ class ClusterBroker extends React.Component {
   }
 
   search = async (filter) => {
+    const { selectValue } = this.state
     this.setState({ loading: true, filter, firstIn: false })
     const data = await newSearch({
       searchKey: filter,
     })
     if (data.data) {
-      if (this.state.selectValue === 'all') {
+      if (selectValue.length === 2) {
         this.setState({ dataSource: data.data })
       } else {
-        this.setState({ dataSource: data.data.filter((e) => { return e.type === this.state.selectValue }) })
+        this.setState({ dataSource: data.data.filter((e) => {
+          return e.type === selectValue[0]
+        }) })
       }
       this.setState({
         oriSource: data.data,
@@ -88,10 +94,10 @@ class ClusterBroker extends React.Component {
   handleFilter = (value) => {
     const { oriSource } = this.state
     this.setState({ selectValue: value })
-    if (value === 'all') {
+    if (value.length === 2) {
       this.setState({ dataSource: oriSource })
     } else {
-      this.setState({ dataSource: oriSource.filter((e) => { return e.type === value }) })
+      this.setState({ dataSource: oriSource.filter((e) => { return e.type === value[0] }) })
     }
   }
 
@@ -124,7 +130,7 @@ class ClusterBroker extends React.Component {
             <AutoComplete
               size="large"
               style={{
-                width: 520, float: 'left', marginLeft: 30
+                width: 520, float: 'left', marginLeft: 30,
               }}
               dataSource={[]}
               value={filter}
@@ -178,14 +184,10 @@ class ClusterBroker extends React.Component {
               textAlign: 'left',
             }}
           >
-            <Select
-              value={selectValue} style={{ width: 200 }}
-              onChange={value => this.handleFilter(value)}
-            >
-              <Option key="all" value="all">全部</Option>
-              <Option key="instance" value="instance">实体</Option>
-              <Option key="class" value="class">概念</Option>
-            </Select>
+            <Checkbox.Group
+              options={plainOptions} value={selectValue}
+              onChange={this.handleFilter}
+            />
           </div>
           <List
             itemLayout="vertical"

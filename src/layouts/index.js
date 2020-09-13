@@ -6,7 +6,6 @@ import zh_CN from 'antd/lib/locale-provider/zh_CN'
 import en_GB from 'antd/lib/locale-provider/en_GB'
 import menuList from '@/constants/menuList'
 import logoFooter from '@/assets/logofooter.png'
-import qrcode from '@/assets/qrcode.png'
 import backGroundImg from '@/assets/14624.jpg'
 
 const {
@@ -75,18 +74,13 @@ class MainLayout extends React.Component {
             style={{ backgroundColor: '#001529', padding: 30 }}
           >
             <div style={{ padding: '0 30px' }}>
-              <div>
-                <div style={{ float: 'left', color: 'white' }}>
-                  <p><img src={logoFooter} alt="" /></p>
-                  <p>©版权所有：互联网教育智能技术及应用国家工程实验室</p>
-                  <p>
-                    地址：北京市昌平区沙河镇满井路甲2号 北京师范大学昌平校园&nbsp;|&nbsp;邮箱：
-                    <a href="mailto:CIT@bnu.edu.cn">CIT@bnu.edu.cn</a>
-                    &nbsp;|&nbsp;电话：010-58807205
-                  </p>
-                </div>
-                <div style={{ float: 'right' }}>
-                  <img src={qrcode} alt="qrcode" />
+              <div style={{ textAlign: 'center', color: 'white' }}>
+                <div style={{ display: 'inline-block' }}>
+                  <img style={{ float: 'left', marginTop: 4, marginRight: 10 }} src={logoFooter} alt="" height="36px" />
+                  <div style={{ float: 'left', textAlign: 'left' }}>
+                    <div style={{ fontSize: 18 }}>知 识 工 程 研 究 室</div>
+                    <div style={{ fontSize: 10 }}>互联网教育智能技术及应用国家工程实验室</div>
+                  </div>
                 </div>
               </div>
             </div>

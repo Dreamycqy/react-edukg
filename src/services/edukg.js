@@ -121,3 +121,11 @@ export function newResult(body, rSymbol) {
     rSymbol,
   })
 }
+
+export function getClassTree(body, rSymbol) {
+  return request.get({
+    url: '/edukg/api/science/classList',
+    data: body,
+    rSymbol,
+  })
+}
