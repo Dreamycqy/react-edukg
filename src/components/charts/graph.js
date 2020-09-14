@@ -110,6 +110,7 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
+      console.log(forcename)
       const nodes = that.hide(_.uniqBy(graph.nodes, 'name'))
       targetIndex = _.findIndex(nodes, { name: forcename })
       if (this.props.newClassGraph) {
@@ -204,7 +205,7 @@ export default class GraphChart extends React.Component {
     myChart.on('dblclick', (params) => {
       that.openOrFold(params, graph)
     })
-    options.series[0].center = myChart._chartsViews[0]._symbolDraw._data._itemLayouts[targetIndex]
+    options.series[0].center = myChart._chartsViews[0]._symbolDraw._data._itemLayouts[targetIndex] // eslint-disable-line
     myChart.setOption(options)
     return myChart
   }

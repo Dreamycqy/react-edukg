@@ -17,6 +17,8 @@ const { TreeNode } = Tree
 const { Search } = Input
 const dataList = []
 
+let parentKey = []
+
 const columns = [{
   title: '标签',
   dataIndex: 'predicate_label',
@@ -110,8 +112,11 @@ class FirstGraph extends React.Component {
     this.getTree()
   }
 
-  onSelect = (keys) => {
-    this.setState({
+  onSelect = async (keys) => {
+    if (keys.length === 0) {
+      return
+    }
+    await this.setState({
       selectKey: keys[0],
     })
     this.handleExpandGraph({
@@ -129,17 +134,18 @@ class FirstGraph extends React.Component {
 
   onTreeSearch = (e) => {
     const { value } = e.target
-    const expandedKeys = []
+    parentKey = []
     dataList.forEach((item) => {
       if (!item.name) {
         return
       }
       if (item.name.indexOf(value) > -1) {
-        expandedKeys.push(this.getParentKey(item.uri, this.state.treeData))
+        this.getParentKey(item.uri, this.state.treeData)
       }
     })
+    const expandedKeys = parentKey
     this.setState({
-      expandedKeys,
+      expandedKeys: _.uniq(expandedKeys),
       searchValue: value,
       autoExpandParent: true,
     })
@@ -262,18 +268,16 @@ class FirstGraph extends React.Component {
   }
 
   getParentKey = (uri, tree) => {
-    let parentKey
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i]
       if (node.children) {
         if (node.children.some(item => item.uri === uri)) {
-          parentKey = node.uri
-        } else if (this.getParentKey(uri, node.children)) {
-          parentKey = this.getParentKey(uri, node.children)
+          parentKey.push(node.uri)
+        } else {
+          this.getParentKey(uri, node.children)
         }
       }
     }
-    return parentKey
   }
 
   getTree = async () => {
@@ -283,11 +287,12 @@ class FirstGraph extends React.Component {
       const treeData = this.generateData(data.data)
       await this.generateList(treeData)
       await this.setState({ treeData, basicGraph })
+      this.getChart('first')
       this.defaultExpand(treeData)
     }
   }
 
-  getChart = async () => {
+  getChart = async (first) => {
     this.setState({ loading: true })
     const { uri } = this.state
     if (uri.length === 0) {
@@ -338,7 +343,9 @@ class FirstGraph extends React.Component {
       })
       if (type === 'class') {
         this.setState({ graph: params })
-        this.onTreeSearch({ target: { value: lable } })
+        if (!first) {
+          this.onTreeSearch({ target: { value: lable } })
+        }
       }
     }
     this.setState({ loading: false })
