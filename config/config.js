@@ -29,10 +29,10 @@ export default {
       hardSource: false,
     }],
   ],
-  outputPath: './public/edukg/',
-  publicPath: '/edukg/',
+  outputPath: './public/sekg/',
+  publicPath: '/sekg/',
   proxy: {
-    '/edukg/api/': { target: 'http://127.0.0.1:8567/', changeOrigin: true },
+    '/sekg/api/': { target: 'http://127.0.0.1:8567/', changeOrigin: true },
   },
   define: defineProperty(),
   routes: pageRoutes,

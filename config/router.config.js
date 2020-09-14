@@ -1,10 +1,10 @@
 export default [
   {
-    path: '/',
-    redirect: '/searchPage',
+    path: '/sekg',
+    redirect: '/sekg/searchPage',
   },
   {
-    path: '/',
+    path: '/sekg',
     component: '../layouts',
     routes: [
       {

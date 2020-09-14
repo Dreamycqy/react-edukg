@@ -3,7 +3,7 @@ const proxy = require('./routes/proxy')
 
 const routesConfig = [
   {
-    path: ['/:module/api/*'],
+    path: ['/sekg/api/*'],
     route: proxy,
   }, {
     path: '**',

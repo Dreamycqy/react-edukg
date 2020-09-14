@@ -438,7 +438,7 @@ class FirstGraph extends React.Component {
 
   handleJump = (filter) => {
     this.props.dispatch(routerRedux.push({
-      pathname: '/searchPage',
+      pathname: '/sekg/searchPage',
       query: {
         filter,
       },
