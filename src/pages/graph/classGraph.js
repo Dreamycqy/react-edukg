@@ -721,12 +721,12 @@ class FirstGraph extends React.Component {
               <Popover
                 content={(
                   <div>
-                    点击概念树或者图上节点，选中概念知识点并展开下级概念，直至底层实体节点。
+                    点击概念树或者图上节点，选中概念知识点并展开关联实体节点。
                   </div>
                 )}
                 title="说明"
               >
-                <a href="javascript:;"><Icon type="question-circle" /></a>
+                <a href="javascript:;"><Icon style={{ fontSize: 20 }} type="question-circle" /></a>
               </Popover>
             )}
           >

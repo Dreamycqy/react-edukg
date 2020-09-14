@@ -675,7 +675,7 @@ class FirstGraph extends React.Component {
                   <Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />
                   关系图
                 </span>
-)}
+              )}
               bordered={false}
               style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20 }}
               extra={(
