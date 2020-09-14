@@ -99,6 +99,7 @@ export default class GraphChart extends React.Component {
   renderChart = (dom, graph, forcename, instance, forceUpdate = false) => {
     let options
     const that = this
+    let targetIndex = 0
     if (!graph.nodes || graph.nodes.length < 1) {
       options = {
         ...options,
@@ -109,7 +110,29 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
-      const nodes = that.hide(graph.nodes)
+      const nodes = that.hide(_.uniqBy(graph.nodes, 'name'))
+      targetIndex = _.findIndex(nodes, { name: forcename })
+      if (this.props.newClassGraph) {
+        nodes.forEach((e) => {
+          if (e.name === forcename) {
+            e.symbolSize = 60
+            e.category = e.type === 'class' ? '0' : '2'
+            e.label.normal.textStyle = {
+              color: '#000000',
+              fontWeight: '700',
+              fontSize: '16',
+            }
+          } else {
+            e.symbolSize = 20
+            e.category = e.type === 'class' ? '3' : '2'
+            e.label.normal.textStyle = {
+              color: '#000000',
+              fontWeight: 'normal',
+              fontSize: '12',
+            }
+          }
+        })
+      }
       options = {
         color: color['line'],
         series: [{
@@ -181,7 +204,8 @@ export default class GraphChart extends React.Component {
     myChart.on('dblclick', (params) => {
       that.openOrFold(params, graph)
     })
-    console.log(myChart._chartsViews[0]._symbolDraw._data._itemLayouts)
+    options.series[0].center = myChart._chartsViews[0]._symbolDraw._data._itemLayouts[targetIndex]
+    myChart.setOption(options)
     return myChart
   }
 

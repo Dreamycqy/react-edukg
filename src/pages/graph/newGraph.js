@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Divider } from 'antd'
+import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Divider, Popover } from 'antd'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -679,7 +679,19 @@ class FirstGraph extends React.Component {
               bordered={false}
               style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20 }}
               extra={(
-                <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
+                <div>
+                  <Popover
+                    content={(
+                      <div>
+                        双击绿色集合节点展开同分类的子节点，单击子节点选中并查看对应词条，关系图随之延伸。左侧目录记录节点访问路径。
+                      </div>
+                    )}
+                    title="说明"
+                  >
+                    <a style={{ marginRight: 20, fontSize: 18 }} href="javascript:;"><Icon type="question-circle" /></a>
+                  </Popover>
+                  <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
+                </div>
               )}
             >
               <Spin spinning={loading}>

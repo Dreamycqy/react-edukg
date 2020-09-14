@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Tree } from 'antd'
+import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Tree, Popover } from 'antd'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -93,7 +93,7 @@ class FirstGraph extends React.Component {
         index: 1,
       },
       modalVisible: false,
-      type: '概念',
+      type: 'class',
       expandedKeys: [],
       selectKey: '',
       treeData: [],
@@ -132,7 +132,6 @@ class FirstGraph extends React.Component {
     const expandedKeys = []
     dataList.forEach((item) => {
       if (!item.name) {
-        console.log(item)
         return
       }
       if (item.name.indexOf(value) > -1) {
@@ -194,7 +193,35 @@ class FirstGraph extends React.Component {
   }
 
   generateGraph = (data) => {
-    const nodes = []
+    const nodes = [{
+      name: '科学',
+      category: '3',
+      symbolSize: 20,
+      uri: 'http://webprotege.stanford.edu/R816WDEyFZ6LnUcUbMsDuzR',
+      symbol: 'circle',
+      draggable: true,
+      type: 'class',
+      label: {
+        normal: {
+          show: true,
+          position: 'bottom',
+          formatter: (val) => {
+            const strs = val.data.name.replace(' ', '\n').split('')
+            let str = ''
+            for (let j = 0, s; s = strs[j++];) {
+              str += s
+              if (!(j % 8) && !test.test(s)) str += '\n'
+            }
+            return str
+          },
+          textStyle: {
+            color: '#000000',
+            fontWeight: 'normal',
+            fontSize: '12',
+          },
+        },
+      },
+    }]
     const links = []
     data.forEach((e) => {
       nodes.push({
@@ -254,8 +281,9 @@ class FirstGraph extends React.Component {
     if (data) {
       const basicGraph = this.generateGraph(JSON.parse(JSON.stringify(data.data)))
       const treeData = this.generateData(data.data)
-      this.generateList(treeData)
-      this.setState({ treeData, basicGraph })
+      await this.generateList(treeData)
+      await this.setState({ treeData, basicGraph })
+      this.defaultExpand(treeData)
     }
   }
 
@@ -316,7 +344,7 @@ class FirstGraph extends React.Component {
     this.setState({ loading: false })
   }
 
-  remakeGraphData = (list, forcename, type) => {
+  remakeGraphData = (list, forcename) => {
     const nodes = []
     const links = []
     list.forEach((e) => {
@@ -331,7 +359,7 @@ class FirstGraph extends React.Component {
         show: true,
         symbol: 'circle',
         draggable: true,
-        type,
+        type: e.type,
         label: {
           normal: {
             show: true,
@@ -359,6 +387,17 @@ class FirstGraph extends React.Component {
       })
     })
     return { nodes, links }
+  }
+
+  defaultExpand = (list) => {
+    const expandedKeys = []
+    list.forEach((e) => {
+      expandedKeys.push(e.uri)
+      e.children.forEach((j) => {
+        expandedKeys.push(j.uri)
+      })
+    })
+    this.setState({ expandedKeys })
   }
 
   handleData = (array) => {
@@ -592,7 +631,6 @@ class FirstGraph extends React.Component {
         e.name += '(实体)'
       }
     })
-    console.log(data.nodes)
     const nodes = data.nodes.concat(basic.nodes)
     const links = data.links.concat(basic.links)
     return {
@@ -672,6 +710,18 @@ class FirstGraph extends React.Component {
                 <span style={{ color: '#24b0e6' }}>{forcename}</span>
               </div>
             )}
+            extra={(
+              <Popover
+                content={(
+                  <div>
+                    点击概念树或者图上节点，选中概念知识点并展开下级概念，直至底层实体节点。
+                  </div>
+                )}
+                title="说明"
+              >
+                <a href="javascript:;"><Icon type="question-circle" /></a>
+              </Popover>
+            )}
           >
             <Spin spinning={loading}>
               <div style={{ float: 'left', width: 300, borderRight: '1px solid #e8e8e8', height: 600, overflowY: 'scroll', padding: '0 10px' }}>
@@ -695,7 +745,7 @@ class FirstGraph extends React.Component {
               <div style={{ height: 600, overflow: 'hidden' }}>
                 <Chart
                   graph={this.mixData(graph, basicGraph, forcename)} forcename={forcename}
-                  handleExpandGraph={this.handleExpandGraph}
+                  handleExpandGraph={this.handleExpandGraph} newClassGraph
                 />
               </div>
             </Spin>
