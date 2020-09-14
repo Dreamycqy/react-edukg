@@ -2,7 +2,7 @@ import React from 'react'
 import echarts from 'echarts'
 import _ from 'lodash'
 import resizeListener, { unbind } from 'element-resize-event'
-import color from '@/constants/colorList'
+// import color from '@/constants/colorList'
 
 export default class GraphChart extends React.Component {
   constructor(...props) {
@@ -135,7 +135,6 @@ export default class GraphChart extends React.Component {
         })
       }
       options = {
-        color: color['line'],
         series: [{
           type: 'graph',
           layout: 'force',
@@ -162,15 +161,59 @@ export default class GraphChart extends React.Component {
           categories: [
             {
               name: '0',
+              itemStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                    offset: 0,
+                    color: '#ca1001',
+                  }, {
+                    offset: 1,
+                    color: '#ff8980',
+                  }]),
+                },
+              },
             },
             {
               name: '1',
+              itemStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                    offset: 0,
+                    color: '#157eff',
+                  }, {
+                    offset: 1,
+                    color: '#35c2ff',
+                  }]),
+                },
+              },
             },
             {
               name: '2',
+              itemStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                    offset: 0,
+                    color: '#ffb402',
+                  }, {
+                    offset: 1,
+                    color: '#ffdc84',
+                  }]),
+                },
+              },
             },
             {
               name: '3',
+              itemStyle: {
+                normal: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
+                    offset: 0,
+                    color: '#01acca',
+                  }, {
+                    offset: 1,
+                    color: '#5adbe7',
+                  }]),
+                },
+              },
             },
           ],
           minRadius: 1,
