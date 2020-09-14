@@ -333,6 +333,7 @@ class FirstGraph extends React.Component {
           }
         })
       }
+      console.log(lable)
       await this.setState({
         forcename: lable,
         dataSource: propety ? this.handleData(newProperty) : [],

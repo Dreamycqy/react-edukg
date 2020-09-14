@@ -25,9 +25,10 @@ export default class GraphChart extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const {
-      graph,
+      graph, forcename,
     } = nextProps
-    return !_.isEqual(graph, this.props.graph)
+    console.log(forcename, this.props.forcename)
+    return !_.isEqual(graph, this.props.graph) || forcename !== this.props.forcename
   }
 
   componentDidUpdate() {
