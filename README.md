@@ -1,4 +1,4 @@
-# react-edukg
+# react-sekg
 Frontend of Edukg (K12 Education Knowledge Graph) system build with React.
 
 1.环境

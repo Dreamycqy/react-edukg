@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "edukg-pro",
+    "name": "sekg-pro",
     "script": "server/www.js",
     "cwd": "",
     "exec_mode": "cluster",
