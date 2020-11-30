@@ -24,7 +24,7 @@ export default {
       antd: true,
       dva: true,
       dynamicImport: true,
-      title: 'SEKG',
+      title: 'sekg',
       dll: false,
       hardSource: false,
     }],
@@ -32,7 +32,7 @@ export default {
   outputPath: './public/sekg/',
   publicPath: '/sekg/',
   proxy: {
-    '/sekg/api/': { target: 'http://127.0.0.1:8567/', changeOrigin: true },
+    '/api/': { target: 'http://127.0.0.1:8345/', changeOrigin: true },
   },
   define: defineProperty(),
   routes: pageRoutes,

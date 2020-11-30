@@ -64,7 +64,7 @@ class MainLayout extends React.Component {
                 lineHeight: '40px',
               }}
             >
-              <Link to="/sekg">SEKG 科学教育图谱</Link>
+              <Link to="/">SEKG 科学教育图谱</Link>
             </div>
           </Header>
           <Content style={{ background: `url(${backGroundImg}) top`, backgroundSize: '120%', minHeight: 800, marginTop: 40 }}>

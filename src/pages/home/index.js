@@ -1,13 +1,11 @@
 import React from 'react'
 import { Button, AutoComplete, Input } from 'antd'
 import router from 'umi/router'
-import { connect } from 'dva'
 import Background from '@/assets/banner2.jpg'
 import Logo from '@/assets/homeLogo.png'
 
 let localCounter = 0
 
-@connect()
 class ClusterBroker extends React.Component {
   constructor(props) {
     super(props)

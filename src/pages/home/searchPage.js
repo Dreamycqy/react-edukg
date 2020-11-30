@@ -103,7 +103,7 @@ class ClusterBroker extends React.Component {
 
   handleJumpGraph = () => {
     this.props.dispatch(routerRedux.push({
-      pathname: '/sekg/classGraph',
+      pathname: '/classGraph',
       query: {
       },
     }))
@@ -232,7 +232,7 @@ class ClusterBroker extends React.Component {
                       <a
                         href="javascript:;"
                         onClick={() => {
-                          window.open(`/sekg/newGraph?uri=${escape(item.uri)}&type=${item.type}`)
+                          window.open(`/newGraph?uri=${escape(item.uri)}&type=${item.type}`)
                         }}
                       >
                         {this.handleHighlight(item.label, filter)}

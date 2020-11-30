@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "start": "umi dev --port=8765",
+    "start": "umi dev --port=8543",
     "prod": "UMI_ENV=prod umi build",
     "prodTest": "UMI_ENV=test umi build",
     "build": "sh build.sh",
