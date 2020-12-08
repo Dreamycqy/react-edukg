@@ -1,5 +1,5 @@
 #!/bin/bash
-branch_name='master'
+branch_name='new'
 pmJson='pm2.json'
 
 if [ $1 ]
