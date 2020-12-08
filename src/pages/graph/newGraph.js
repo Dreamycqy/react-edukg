@@ -14,9 +14,13 @@ import kpchinaTitle from '@/assets/kpchina_title.png'
 import baiduTitle from '@/assets/baidu_title.png'
 import kepuTitle from '@/assets/kepu_title.jpg'
 import kpsourceTitle from '@/assets/kpsource_title.jpg'
+import thinkData from '@/constants/高中地理'
+import Think from './think'
+import Questions from './question'
 import Styles from './style.less'
 
 const { Link } = Anchor
+const ButtonGroup = Button.Group
 const test = /^[A-Za-z]+$/i
 
 const columns = [{
@@ -102,6 +106,7 @@ class FirstGraph extends React.Component {
       },
       type: getUrlParams().type,
       kgLarger: false,
+      showRelation: true,
     }
   }
 
@@ -464,7 +469,7 @@ class FirstGraph extends React.Component {
         >
           <List
             size="small"
-            pagination={false}
+            pagination={{ size: 'small' }}
             itemLayout="vertical"
             expandedRowRender={record => (
               <div style={{ margin: 0 }}>
@@ -563,63 +568,43 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      forcename, dataSource, loading, resource, filter, searchKey, kgLarger,
-      imgList, wikiLinks, selectImg, modalVisible, graph, type, graphHistory,
+      forcename, dataSource, loading, searchKey, kgLarger,
+      imgList, wikiLinks, selectImg, modalVisible, graph, type, graphHistory, showRelation,
     } = this.state
     return (
       <div style={{ paddingTop: 10, overflow: 'hidden', minWidth: 1300, backgroundColor: '#f2f6f7e6' }}>
-        <div style={{ float: 'left', width: 250 }}>
-          <div style={{ height: 60, marginLeft: 30, marginTop: 6 }}>
-            <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
-            <div style={{ fontSize: 38, float: 'left', color: '#6e72df', fontWeight: 700 }}>SEKG</div>
-          </div>
-          <Anchor onClick={this.handleClick} className={Styles.anchor}>
-            {dataSource.length > 0
-              ? <Link href="#components-anchor-props" style={{ margin: 10 }} title="知识属性" />
-              : null
-            }
-            <Link href="#components-anchor-graph" style={{ margin: 10 }} title="关系图" />
-            {imgList.length > 0
-              ? <Link href="#components-anchor-pics" style={{ margin: 10 }} title="相关图片" />
-              : null
-            }
-            {this.handleAnchor(wikiLinks)}
-            <Link href="#components-anchor-pages" style={{ margin: 10 }} title="相关论文" />
-          </Anchor>
-        </div>
         <div style={{ overflow: 'hidden' }}>
-          <div style={{ height: 60, margin: '10px 0 0 20px' }}>
-            <Input
-              value={searchKey}
-              onChange={e => this.setState({ searchKey: e.target.value })}
-              onPressEnter={e => this.handleJump(e.target.value)}
-              placeholder="请输入科学教育相关知识点"
-              style={{
-                borderBottomRightRadius: 0,
-                borderTopRightRadius: 0,
-                width: '70%',
-                height: 50,
-                lineHeight: '50px',
-                fontSize: 24,
-                float: 'left',
-              }}
-            />
-            <Button
-              style={{
-                float: 'left',
-                height: 50,
-                width: '12%',
-                borderBottomLeftRadius: 0,
-                borderTopLeftRadius: 0,
-              }}
-              type="primary" size="large"
-              onClick={() => this.handleJump(searchKey)}
-            >
-              搜索
-            </Button>
-          </div>
           <div>
-            <div style={{ marginLeft: 30, fontSize: 20, fontWeight: 700 }}>
+            <div style={{ height: 80, overflow: 'hidden' }}>
+              <div style={{ height: 60, margin: '10px 20px 0 0', float: 'right' }}>
+              <Input
+                value={searchKey}
+                onChange={e => this.setState({ searchKey: e.target.value })}
+                onPressEnter={e => this.handleJump(e.target.value)}
+                placeholder="请输入基础教育相关知识点"
+                style={{
+                  borderBottomRightRadius: 0,
+                  borderTopRightRadius: 0,
+                  width: 500,
+                  height: 50,
+                  lineHeight: '50px',
+                  fontSize: 24,
+                }}
+              />
+              <Button
+                style={{
+                  float: 'right',
+                  height: 50,
+                  borderBottomLeftRadius: 0,
+                  borderTopLeftRadius: 0,
+                }}
+                type="primary" size="large"
+                onClick={() => this.handleJump(searchKey)}
+              >
+                搜索
+              </Button>
+            </div>
+              <div style={{ marginLeft: 30, fontSize: 20, fontWeight: 700, float: 'left' }}>
               <span style={{ fontSize: 14, fontWeight: 400 }}>
                 <a href="javascript:;"><Icon type="profile" /></a>
                 <span style={{ margin: '0 10px' }}>分类：</span>
@@ -655,72 +640,97 @@ class FirstGraph extends React.Component {
               </span>
               <span style={{ color: '#24b0e6' }}>{forcename}</span>
             </div>
-            <Card className={Styles.myCard} id="components-anchor-props" style={{ display: dataSource.length === 0 ? 'none' : 'block', margin: 20 }} bordered={false}>
-              <Table
-                dataSource={dataSource}
-                columns={columns}
-                loading={loading}
-                size="small"
-                className={Styles.myTable}
-                showHeader={false}
-                pagination={false}
-                rowKey={record => record.propertyname}
-              />
-            </Card>
-            <Card
-              className={Styles.myCard}
-              id="components-anchor-graph"
-              title={(
-                <span>
-                  <Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />
-                  关系图
-                </span>
-              )}
-              bordered={false}
-              style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20 }}
-              extra={(
-                <div>
-                  <Popover
-                    content={(
-                      <div>
-                        双击蓝色集合节点展开同分类的子节点，单击子节点选中并查看对应词条，关系图随之延伸。左侧目录记录节点访问路径。
-                      </div>
-                    )}
-                    title="说明"
-                  >
-                    <a style={{ marginRight: 20, fontSize: 18 }} href="javascript:;"><Icon type="question-circle" /></a>
-                  </Popover>
-                  <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
-                </div>
-              )}
-            >
-              <Spin spinning={loading}>
-                <div style={{ height: kgLarger === true ? 600 : 400 }}>
-                  <div style={{ float: 'left', width: 200, borderRight: '1px solid #e8e8e8', height: '100%', overflowY: 'scroll' }}>
-                    {graphHistory.map((e, index) => (
-                      <div style={{ padding: 6 }}>
-                        <a
-                          href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
-                          onClick={() => this.handleExpandGraph(e)}
-                        >
-                          {index === graphHistory.length - 1
-                            ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-                            : <div style={{ width: 24, display: 'inline-block' }} />
-                          }
-                          {e.name}
-                        </a>
-                      </div>
-                    ))}
+            </div>
+            <div style={{ height: 560, overflow: 'hidden' }}>
+              <Card
+                className={Styles.myCard}
+                id="components-anchor-graph"
+                title={(
+                  <span>
+                    <Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />
+                    关系图
+                  </span>
+                )}
+                bordered={false}
+                style={kgLarger === true ? { margin: 20, top: '5%', left: '5%', width: '90%', position: 'fixed', zIndex: 999 } : { margin: 20, float: 'left', width: '65%' }}
+                extra={(
+                  <div>
+                    <Popover
+                      content={(
+                        <div style={{ width: 400 }}>
+                          关系图：双击蓝色集合节点展开同分类的子节点，单击子节点选中并查看对应词条，关系图随之延伸。左侧目录记录节点访问路径。
+                        </div>
+                      )}
+                      title="说明"
+                    >
+                      <a style={{ marginRight: 20, fontSize: 18 }} href="javascript:;"><Icon type="question-circle" /></a>
+                    </Popover>
+                    <Button style={{ marginRight: 20 }} onClick={() => window.open('/kgPage?key=chinese&type=subject')}>
+                      全图
+                    </Button>
+                    <ButtonGroup style={{ marginRight: 20 }}>
+                      <Button type={showRelation === true ? 'primary' : 'none' } onClick={() => this.setState({ showRelation: true })}>关系图</Button>
+                      <Button type={showRelation === false ? 'primary' : 'none' } onClick={() => this.setState({ showRelation: false })}>思维导图</Button>
+                    </ButtonGroup>
+                    <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
                   </div>
-                  <div style={{ height: kgLarger === true ? 600 : 400, overflow: 'hidden' }}>
-                    <Chart
-                      graph={graph} forcename={forcename}
-                      handleExpandGraph={this.handleExpandGraph}
-                    />
+                )}
+              >
+                <Spin spinning={loading}>
+                  <div style={{ height: kgLarger === true ? 600 : 450, display: showRelation === true ? 'block' : 'none' }}>
+                    <div style={{ float: 'left', width: 200, borderRight: '1px solid #e8e8e8', height: '100%', overflowY: 'scroll' }}>
+                      {graphHistory.map((e, index) => (
+                        <div style={{ padding: 6 }}>
+                          <a
+                            href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
+                            onClick={() => this.handleExpandGraph(e)}
+                          >
+                            {index === graphHistory.length - 1
+                              ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
+                              : <div style={{ width: 24, display: 'inline-block' }} />
+                            }
+                            {e.name}
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ height: kgLarger === true ? 600 : 450, width: kgLarger === true ? 1000 : 'auto', overflow: 'hidden' }}>
+                      <Chart
+                        graph={graph} forcename={forcename} resize={{ kgLarger, showRelation }}
+                        handleExpandGraph={this.handleExpandGraph}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Spin>
-            </Card>
+                  <div style={{ height: kgLarger === true ? 600 : 450, display: showRelation === true ? 'none' : 'block' }}>
+                    <Think graph={thinkData} resize={{ kgLarger, showRelation }} />
+                  </div>
+                </Spin>
+              </Card>
+              <Card
+                className={Styles.myCard}
+                headStyle={{ height: 64 }}
+                title={(
+                  <span>
+                    <Icon type="file" style={{ color: '#24b0e6', marginRight: 10 }} />
+                    属性
+                  </span>
+                )}
+                bordered={false}
+                style={{ margin: 20, overflow: 'hidden' }}
+              >
+                <Table
+                  dataSource={dataSource}
+                  columns={columns}
+                  loading={loading}
+                  size="small"
+                  className={Styles.myTable}
+                  showHeader={false}
+                  pagination={false}
+                  scroll={{ y: 450 }}
+                  rowKey={record => record.propertyname}
+                />
+              </Card>
+            </div>
             <Card
               className={Styles.myCard} bordered={false}
               style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
@@ -729,7 +739,7 @@ class FirstGraph extends React.Component {
                   <Icon type="picture" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
                   相关图片
                 </span>
-)}
+            )}
             >
               <Spin spinning={loading}>
                 <div style={{ height: 280 }}>
@@ -743,126 +753,42 @@ class FirstGraph extends React.Component {
                 </div>
               </Spin>
             </Card>
-            {this.renderCard(wikiLinks)}
             <Card
-              className={Styles.myCard}
-              style={{ margin: 20 }}
+              className={Styles.myCard} bordered={false}
+              style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
+              title={(
+                <span>
+                  <Icon type="play-circle" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  教学视频
+                </span>
+            )}
+            >
+              <Spin spinning={loading}>
+                <div style={{ height: 280 }}>
+                  <div style={{ padding: 10 }}>
+                    <a href="http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_detail&courseId=5230008" target="_blank">
+                      <img src="https://edu.10086.cn/files/webupload//course/new/1599041949142.png" height="240px" width="360px" alt=""/>
+                      <p style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>高一地理秋季同步班</p>
+                    </a>
+                  </div>
+                </div>
+              </Spin>
+            </Card>
+            <Card
+              className={Styles.myCard} bordered={false}
+              style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
               title={(
                 <span>
                   <Icon type="read" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
-                  相关论文
+                  相关习题
                 </span>
-)}
-              bordered={false}
-              id="components-anchor-pages"
-              extra={(
-                <Cascader
-                  options={options}
-                  value={filter}
-                  rows={4}
-                  onChange={value => this.setState({ filter: value })}
-                  allowClear={false}
-                />
-              )}
+            )}
             >
-              <List
-                itemLayout="vertical"
-                size="large"
-                dataSource={_.orderBy(resource, filter[0], filter[1])}
-                loading={loading}
-                pagination={{
-                  showSizeChanger: false,
-                  size: 'small',
-                  style: { display: typeof resource === 'object' && resource.length > 0 ? 'block' : 'none' },
-                }}
-                style={{ height: 600, overflowY: 'scroll', padding: '0 20px 20px 20px' }}
-                renderItem={(item) => {
-                  return (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={(
-                          <a
-                            href="javascript:;"
-                            onClick={() => { window.open(`https://www.aminer.cn/pub/${item.id}`) }}
-                          >
-                            { item.title_zh ? <span>{item.title_zh}</span> : null }
-                            { item.title_zh ? <br /> : null }
-                            { item.title ? <span>{item.title}</span> : null }
-                          </a>
-                        )}
-                        description={(
-                          <div>
-                            <Icon
-                              type="read"
-                              style={{ marginRight: 8, color: '#24b0e6' }}
-                            />
-                            出版期刊：
-                            {!item.venue ? '未知'
-                              : !item.venue.info ? '未知'
-                                : !item.venue.info.name_zh ? '未知'
-                                  : item.venue.info.name_zh.length === 0 ? '未知'
-                                    : item.venue.info.name
-                                      ? item.venue.info.name : '未知'
-                            }
-                            &nbsp;&nbsp;&nbsp;&nbsp;
-                            <Icon
-                              type="clock-circle"
-                              style={{ marginRight: 8, color: '#24b0e6' }}
-                            />
-                            出版时期：
-                            {item.year ? `${item.year}年` : '未知年份'}
-                            {item.venue ? `    第${item.venue.issue}期` : '    未知期数'}
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                          </div>
-                        )}
-                      />
-                      <div>
-                        {/* <div style={{ color: '#00000073' }}>
-                          <Icon
-                            type="diff"
-                            style={{ marginRight: 8, color: '#24b0e6' }}
-                          />
-                          相关度：
-                          <span style={{ color: 'red' }}>{item.score}</span>
-                        </div> */}
-                        <div style={{ marginTop: 10, color: '#00000073' }}>
-                          <Icon
-                            type="user"
-                            style={{ marginRight: 8, color: '#24b0e6' }}
-                          />
-                          作者：
-                          {
-                            item.authors
-                              ? item.authors.length > 0 ? item.authors.map((e) => {
-                                return (
-                                  <span style={{ marginRight: 10 }}>
-                                    {e.name_zh ? e.name_zh : e.name}
-                                  </span>
-                                )
-                              })
-                                : <span>未知作者</span> : <span>未知作者</span>
-                          }
-                        </div>
-                        <div style={{ marginTop: 10, color: '#00000073' }}>
-                          <Icon
-                            type="tags"
-                            style={{ marginRight: 8, color: '#24b0e6' }}
-                          />
-                          关键词：
-                          {
-                            item.keywords
-                              ? <span>{item.keywords.join(', ')}</span>
-                              : null
-                          }
-                        </div>
-                        <div style={{ marginTop: 10 }}>{item.abstract}</div>
-                        <div style={{ marginTop: 10 }}>{item.abstract_zh}</div>
-                      </div>
-                    </List.Item>
-                  )
-                }}
-              />
+              <Spin spinning={loading}>
+                <Questions />
+              </Spin>
             </Card>
+            {this.renderCard(wikiLinks)}
           </div>
         </div>
         <div style={{ position: 'fixed', width: '100%', height: '100%', top: 0, zIndex: 998, display: kgLarger === true ? 'block' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.65)' }} />

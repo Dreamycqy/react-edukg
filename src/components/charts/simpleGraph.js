@@ -25,9 +25,9 @@ export default class GraphChart extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const {
-      graph, forcename, resize,
+      graph, forcename,
     } = nextProps
-    return !_.isEqual(graph, this.props.graph) || forcename !== this.props.forcename || !_.isEqual(resize, this.props.resize)
+    return !_.isEqual(graph, this.props.graph) || forcename !== this.props.forcename
   }
 
   componentDidUpdate() {
@@ -69,16 +69,12 @@ export default class GraphChart extends React.Component {
 
   jumpToGraph = (param) => {
     const { data } = param
-    const { category, uri, name, type } = data
+    const { category, uri } = data
     if (category === '0') {
       return
     }
     if (category !== '1') {
-      this.props.handleExpandGraph({
-        uri,
-        name,
-        type,
-      })
+      this.props.handleSelect(uri)
     }
   }
 
@@ -110,14 +106,17 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
-      console.log(forcename)
       const nodes = that.hide(_.uniqBy(graph.nodes, 'name'))
-      targetIndex = _.findIndex(nodes, { name: forcename })
+      if (_.findIndex(nodes, { name: forcename })) {
+        targetIndex = _.findIndex(nodes, { name: forcename })
+      } else if (targetIndex = _.findIndex(nodes, { uri: forcename })) {
+        targetIndex = _.findIndex(nodes, { uri: forcename })
+      }
       if (this.props.newClassGraph) {
         nodes.forEach((e) => {
-          if (e.name === forcename) {
+          if (e.name === forcename || e.uri === forcename) {
             e.symbolSize = 60
-            e.category = e.type === 'class' ? '0' : '2'
+            e.category = '0'
             e.label.normal.textStyle = {
               color: '#000000',
               fontWeight: '700',
@@ -254,6 +253,6 @@ export default class GraphChart extends React.Component {
   }
 
   render() {
-    return <div className="e-charts-graph" ref={t => this.dom = t} style={{ height: '100%', width: '100%' }} />
+    return <div className="e-charts-graph" ref={t => this.dom = t} style={{ height: '100%' }} />
   }
 }

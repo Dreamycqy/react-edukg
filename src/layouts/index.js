@@ -64,7 +64,7 @@ class MainLayout extends React.Component {
                 lineHeight: '40px',
               }}
             >
-              <Link to="/">SEKG 科学教育图谱</Link>
+              <Link to="/">Edukg 基础教育知识图谱</Link>
             </div>
           </Header>
           <Content style={{ background: `url(${backGroundImg}) top`, backgroundSize: '120%', minHeight: 800, marginTop: 40 }}>
@@ -76,11 +76,8 @@ class MainLayout extends React.Component {
             <div style={{ padding: '0 30px' }}>
               <div style={{ textAlign: 'center', color: 'white' }}>
                 <div style={{ display: 'inline-block' }}>
-                  <img style={{ float: 'left', marginTop: 4, marginRight: 10 }} src={logoFooter} alt="" height="36px" />
-                  <div style={{ float: 'left', textAlign: 'left' }}>
-                    <div style={{ fontSize: 18 }}>知 识 工 程 研 究 室</div>
-                    <div style={{ fontSize: 10 }}>互联网教育智能技术及应用国家工程实验室</div>
-                  </div>
+                  <div style={{ fontSize: 18 }}>Copyright© 2018 KEG</div>
+                  <div style={{ fontSize: 10 }}>清华大学知识工程研究室&nbsp;&nbsp;&nbsp;&nbsp;京ICP备19056327号-1</div>
                 </div>
               </div>
             </div>

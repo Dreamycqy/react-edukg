@@ -19,6 +19,10 @@ export default [
         path: 'classGraph',
         component: './graph/classGraph',
       },
+      {
+        path: 'kgPage',
+        component: './kgPage/index',
+      },
     ],
   },
 ]

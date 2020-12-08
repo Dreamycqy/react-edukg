@@ -49,7 +49,7 @@ class ClusterBroker extends React.Component {
             <img src={Logo} alt="logo" width="84px" height="84px" />
           </div>
           <div style={{ float: 'left', fontSize: 42, marginTop: 16, color: 'white' }}>
-            SEKG 科学教育图谱
+            Edukg 基础教育知识图谱
           </div>
         </div>
         <br />

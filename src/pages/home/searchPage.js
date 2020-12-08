@@ -103,8 +103,10 @@ class ClusterBroker extends React.Component {
 
   handleJumpGraph = () => {
     this.props.dispatch(routerRedux.push({
-      pathname: '/classGraph',
+      pathname: '/kgPage',
       query: {
+        key: 'chinese',
+        type: 'subject',
       },
     }))
   }
@@ -125,7 +127,7 @@ class ClusterBroker extends React.Component {
           <div style={{ height: 70, width: 900, display: 'inline-block' }}>
             <div style={{ height: 60, display: 'inline-block', float: 'left' }}>
               <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
-              <div style={{ fontSize: 38, float: 'left', color: '#6e72df', fontWeight: 700 }}>SEKG</div>
+              <div style={{ fontSize: 36, float: 'left', color: '#6e72df', fontWeight: 700 }}>Edukg</div>
             </div>
             <AutoComplete
               size="large"
@@ -142,7 +144,7 @@ class ClusterBroker extends React.Component {
             >
               <Input
                 onPressEnter={e => this.search(e.target.value)}
-                placeholder="请输入科学教育相关知识点"
+                placeholder="请输入基础教育相关知识点"
                 style={{
                   borderBottomRightRadius: 0,
                   borderTopRightRadius: 0,
@@ -282,15 +284,7 @@ class ClusterBroker extends React.Component {
           <div style={{ display: 'inline-block' }}>
             <img src={kgIcon} alt="" width="200px" style={{ float: 'left' }} />
             <div style={{ width: 560, overflow: 'hidden', paddingTop: 10, paddingLeft: 50 }}>
-              科学教育知识图谱是以中国的科学课程标准、
-              美国的《Next Generation Science Standards》为基础，
-              结合基础教育知识图谱edukg中的内容构建而成的面向科学教育的知识图谱。
-              该图谱涵盖地球与宇宙科学、物质科学、生命科学三大模块，
-              涉及到物理、化学、地理、生物四门学科，
-              适合从小学起各个学段的学生和教师进行学习和使用。
-              图谱中将科学学科的核心概念表示为树状知识体系，各个知识点以实体的形式展示。
-              为充分利用互联网的学习资源，本图谱将科普中国等多个网站的图文、视频、学术论文等资源与知识点进行链接，
-              实现知识的互联共通。
+            本知识图谱是一个大规模的基础教育领域的知识图谱，它提供了基础教育领域中的多维知识描述， 还包含与其他基础教育文本资源的实体连接。 另外，本知识图谱是基于基础教育领域权威的教材教辅资料和海量的互联网文本资源，通过知识图谱构建技术构建得到， 所包含的内容非常丰富。可以通过知识图谱的搜索功能进行实体搜索，搜索结果既展示了该实体与其他实体的关系，也展示了该实体的所有属性及知识来源。
             </div>
             <Button
               style={{ marginTop: 20, marginLeft: 10 }}

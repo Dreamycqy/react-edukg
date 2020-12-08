@@ -13,7 +13,9 @@ router.all('/', (req, res) => {
   if (url.indexOf('api') > -1) {
     url = url.split('/api')[1] // eslint-disable-line
   }
-  if (url.indexOf('science') > -1) {
+  if (url.indexOf('typeNew') > -1) {
+    url = newPath + url.split('/typeNew/res_lib')[1]
+  } else if (url.indexOf('science') > -1) {
     url = newPath + url
   } else {
     url = (typeof basePath === 'string' ? basePath : basePath[hostname]) + url
