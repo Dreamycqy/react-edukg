@@ -8,13 +8,13 @@ import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
 import { getUrlParams } from '@/utils/common'
 import Chart from '@/components/charts/graph'
-import { newResult } from '@/services/edukg'
-import GrapeImg from '@/assets/grape.png'
+import { infoByInstanceUri } from '@/services/knowledge'
+import { getGraphBySubandGrade } from '@/services/kgApi'
 import kpchinaTitle from '@/assets/kpchina_title.png'
 import baiduTitle from '@/assets/baidu_title.png'
 import kepuTitle from '@/assets/kepu_title.jpg'
 import kpsourceTitle from '@/assets/kpsource_title.jpg'
-import thinkData from '@/constants/高中地理'
+import subList from '@/constants/subject'
 import Think from './think'
 import Questions from './question'
 import Styles from './style.less'
@@ -25,8 +25,8 @@ const test = /^[A-Za-z]+$/i
 
 const columns = [{
   title: '标签',
-  dataIndex: 'predicate_label',
-  width: 150,
+  dataIndex: 'predicateLabel',
+  width: 100,
   align: 'left',
   render: (text) => {
     return <span style={{ fontWeight: 700 }}>{text}</span>
@@ -41,10 +41,10 @@ const columns = [{
     const typeNew = record.predicate ? record.predicate.split('#')[1] : ''
     if (typeNew === 'image' || record.object.indexOf('getjpg') > -1 || record.object.indexOf('getpng') > -1) {
       return <img style={{ maxHeight: 300 }} alt="" src={record.object} />
-    } else if (typeNew === 'category' || (record.object.indexOf('http') > -1 && record.object_label.length > 0)) {
-      return <span style={{ color: '#24b0e6' }}>{record.labelList.join('， ')}</span>
+    } else if (typeNew === 'category' || (record.object.indexOf('http') > -1 || record.objectLabel)) {
+      return <span style={{ color: '#24afe6' }}>{record.labelList.join('， ')}</span>
     } else {
-      return <span style={{ color: '#24b0e6' }}>{record.object}</span>
+      return <span style={{ color: '#24afe6' }}>{record.object}</span>
     }
   },
 }]
@@ -107,11 +107,26 @@ class FirstGraph extends React.Component {
       type: getUrlParams().type,
       kgLarger: false,
       showRelation: true,
+      subject: getUrlParams().subject || 'chinese',
+      thinkData: [],
     }
   }
 
-  componentWillMount() {
-    this.getChart()
+  componentWillMount = async () => {
+    await this.getChart()
+    this.getSubKg()
+  }
+
+  getSubKg = async () => {
+    const data = await getGraphBySubandGrade({
+      subject: this.state.subject,
+      gradeLevel: '11',
+    })
+    if (data) {
+      const rawData = this.handleGraphData(data.data)
+      const treeData = this.generateData(rawData)
+      this.setState({ thinkData: treeData[0] })
+    }
   }
 
   getChart = async () => {
@@ -130,21 +145,24 @@ class FirstGraph extends React.Component {
       })
       return
     }
-    const data = await newResult({
+    // const data = await newResult({
+    //   uri,
+    // })
+    const data = await infoByInstanceUri({
       uri,
     })
     if (data) {
-      const { lable, propety, paper, resourcePropety, content } = data.data
+      const { label, property, paper, content } = data.data
       const wikiLinks = {}
       const newProperty = []
       if (graphHistory.length === 0) {
         graphHistory.push({
-          name: lable,
+          name: label,
           uri,
           type,
         })
       }
-      const params = this.remakeGraphData(content, lable, type)
+      const params = this.remakeGraphData(content, label, 'instance')
       graphHistory.forEach((e, index) => {
         if (index < graphHistory.length - 1) {
           params.nodes = params.nodes.filter((j) => { return j.name !== e.name })
@@ -183,31 +201,33 @@ class FirstGraph extends React.Component {
             },
           },
         })
-        params.links.push({
-          source: e.name,
-          target: graphHistory[index - 1] ? graphHistory[index - 1].name : null,
-        })
+        if (graphHistory[index - 1]) {
+          params.links.push({
+            source: e.name,
+            target: graphHistory[index - 1].name,
+          })
+        }
       })
-      if (resourcePropety) {
-        propety.forEach((e) => {
-          const target = _.filter(resourcePropety, { resourceuri: e.object })
-          if (target.length > 0) {
-            if (!wikiLinks[e.predicate_label]) {
-              wikiLinks[e.predicate_label] = []
-            }
-            const item = {
-              ...e,
-              propety: target,
-            }
-            wikiLinks[e.predicate_label].push(item)
-          } else {
-            newProperty.push(e)
-          }
-        })
-      }
+      // if (resourceproperty) {
+      //   property.forEach((e) => {
+      //     const target = _.filter(resourceproperty, { resourceuri: e.object })
+      //     if (target.length > 0) {
+      //       if (!wikiLinks[e.predicate_label]) {
+      //         wikiLinks[e.predicate_label] = []
+      //       }
+      //       const item = {
+      //         ...e,
+      //         property: target,
+      //       }
+      //       wikiLinks[e.predicate_label].push(item)
+      //     } else {
+      //       newProperty.push(e)
+      //     }
+      //   })
+      // }
       this.setState({
-        forcename: lable,
-        dataSource: propety ? this.handleData(newProperty) : [],
+        forcename: label,
+        dataSource: property ? this.handleData(property) : [],
         resource: paper ? paper.data[0].items : [],
         wikiLinks,
         graphHistory,
@@ -277,7 +297,7 @@ class FirstGraph extends React.Component {
             category: '2', // 叶子节点
             symbolSize: 16, // 节点大小
             uri: e.object || e.subject,
-            show: false,
+            show: true,
             symbol: 'circle',
             edgeSymbol: ['circle', 'arrow'],
             edgeSymbolSize: [4, 10],
@@ -316,7 +336,7 @@ class FirstGraph extends React.Component {
             category: '2', // 叶子节点
             symbolSize: 16, // 节点大小
             uri: e.object || e.subject,
-            show: false,
+            show: true,
             symbol: 'circle',
             edgeSymbol: ['circle', 'arrow'],
             edgeSymbolSize: [4, 10],
@@ -357,23 +377,88 @@ class FirstGraph extends React.Component {
     const result = []
     const imgList = []
     array.forEach((e) => {
-      if (e.predicate_label && e.predicate_label !== '学术论文') {
+      if (e.predicateLabel && e.predicateLabel !== '学术论文') {
         if (e.type === 'image' || e.object.indexOf('getjpg') > 0 || e.object.indexOf('getpng') > 0) {
           imgList.push(e)
         } else {
-          const target = _.find(result, { predicate_label: e.predicate_label })
+          const target = _.find(result, { predicateLabel: e.predicateLabel })
           if (!target) {
             result.push({
               ...e,
-              labelList: [e.object_label],
+              labelList: [e.object ? e.object : e.objectLabel],
             })
           } else {
-            target.labelList.push(e.object_label)
+            target.labelList.push(e.object ? e.object : e.objectLabel)
           }
         }
       }
     })
     this.setState({ imgList })
+    return result
+  }
+
+  generateData = (list) => {
+    const result = {}
+    const startKey = []
+    const newList = list || this.state.rawData
+    const theName = _.find(subList, { value: this.state.subject }).name
+    newList.forEach((item) => {
+      if (!result[item.uri]) {
+        result[item.uri] = item
+      }
+    })
+    const map = []
+    newList.forEach((item) => {
+      if (item.name === theName && startKey.indexOf(item.uri) < 0) {
+        startKey.push(item.uri)
+      }
+      if (item.target_uri) {
+        if (!result[item.target_uri].children) {
+          result[item.target_uri].children = []
+        }
+        if (!_.find(result[item.target_uri].children, { uri: item.uri })) {
+          result[item.target_uri].children.push(item)
+        }
+      } else if (this.state.showSingle === true && item.name !== theName) {
+        map.push(item)
+      }
+    })
+    startKey.forEach((e) => {
+      map.unshift(result[e])
+    })
+    return map
+  }
+
+  handleGraphData = (array) => {
+    const result = []
+    array.forEach((e) => {
+      if (e.path.length > 0) {
+        result.push({
+          target: null,
+          target_uri: null,
+          name: e.path[0][e.path[0].length - 1].categoryLabel,
+          uri: e.path[0][e.path[0].length - 1].category,
+          type: 'class',
+        })
+        e.path[0].forEach((p, index) => {
+          result.push({
+            target_uri: p.category,
+            target: p.categoryLabel,
+            name: index === 0 ? e.uriName : e.path[0][index - 1].categoryLabel,
+            uri: index === 0 ? e.uri : e.path[0][index - 1].category,
+            type: 'class',
+          })
+        })
+      } else {
+        result.push({
+          target_uri: null,
+          target: null,
+          name: e.uriName,
+          uri: e.uri,
+          type: 'instance',
+        })
+      }
+    })
     return result
   }
 
@@ -473,12 +558,12 @@ class FirstGraph extends React.Component {
             itemLayout="vertical"
             expandedRowRender={record => (
               <div style={{ margin: 0 }}>
-                {this.renderExpand(record.propety)}
+                {this.renderExpand(record.property)}
               </div>
             )}
             dataSource={list[obj]}
             renderItem={(item) => {
-              const imgTarget = _.find(item.propety, { predicate_label: '资源图片' })
+              const imgTarget = _.find(item.property, { predicate_label: '资源图片' })
               return (
                 <List.Item
                   style={{ padding: 10 }}
@@ -495,24 +580,24 @@ class FirstGraph extends React.Component {
                     title={(
                       <a
                         href="javascript:;"
-                        onClick={() => { window.open(_.find(item.propety, { predicate_label: '资源链接' }).object) }}
+                        onClick={() => { window.open(_.find(item.property, { predicate_label: '资源链接' }).object) }}
                       >
-                        { _.find(item.propety, { predicate_label: '资源标题' }).object }
+                        { _.find(item.property, { predicate_label: '资源标题' }).object }
                       </a>
                     )}
                     description={(
                       <div>
                         <Icon
                           type="read"
-                          style={{ marginRight: 8, color: '#24b0e6' }}
+                          style={{ marginRight: 8, color: '#fff' }}
                         />
                         资源类别：
-                        {_.find(item.propety, { predicate_label: '资源类别' }).object}
+                        {_.find(item.property, { predicate_label: '资源类别' }).object}
                       </div>
                     )}
                   />
                   <div>
-                    {item.propety.filter((e) => {
+                    {item.property.filter((e) => {
                       return (e.predicate_label !== '资源标题' && e.predicate_label !== '资源类别' && e.predicate_label !== '资源链接' && e.predicate_label !== '资源图片')
                     }).map(e => (
                       <div>
@@ -568,8 +653,8 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      forcename, dataSource, loading, searchKey, kgLarger,
-      imgList, wikiLinks, selectImg, modalVisible, graph, type, graphHistory, showRelation,
+      forcename, dataSource, loading, searchKey, kgLarger, uri, subject, thinkData,
+      imgList, selectImg, modalVisible, graph, type, graphHistory, showRelation,
     } = this.state
     return (
       <div style={{ paddingTop: 10, overflow: 'hidden', minWidth: 1300, backgroundColor: '#f2f6f7e6' }}>
@@ -582,19 +667,21 @@ class FirstGraph extends React.Component {
                 onChange={e => this.setState({ searchKey: e.target.value })}
                 onPressEnter={e => this.handleJump(e.target.value)}
                 placeholder="请输入基础教育相关知识点"
+                addonBefore={<div>{_.find(subList, { value: subject }).name}</div>}
                 style={{
                   borderBottomRightRadius: 0,
                   borderTopRightRadius: 0,
                   width: 500,
-                  height: 50,
-                  lineHeight: '50px',
-                  fontSize: 24,
+                  height: 40,
+                  lineHeight: '40px',
+                  fontSize: 20,
                 }}
+                size="large"
               />
               <Button
                 style={{
                   float: 'right',
-                  height: 50,
+                  height: 40,
                   borderBottomLeftRadius: 0,
                   borderTopLeftRadius: 0,
                 }}
@@ -605,23 +692,6 @@ class FirstGraph extends React.Component {
               </Button>
             </div>
               <div style={{ marginLeft: 30, fontSize: 20, fontWeight: 700, float: 'left' }}>
-              <span style={{ fontSize: 14, fontWeight: 400 }}>
-                <a href="javascript:;"><Icon type="profile" /></a>
-                <span style={{ margin: '0 10px' }}>分类：</span>
-                {dataSource.filter((e) => { return e.predicate_label === '分类' }).map((e, index) => {
-                  if (index < dataSource.filter((j) => { return j.predicate_label === '分类' }).length - 1) {
-                    return (
-                      <span>
-                        {e.object_label}
-                        <Divider type="vertical" style={{ backgroundColor: '#bbb' }} />
-                      </span>
-                    )
-                  } else {
-                    return <span>{e.object_label}</span>
-                  }
-                })}
-              </span>
-              <br />
               <span
                 style={{
                   marginTop: 10,
@@ -638,7 +708,23 @@ class FirstGraph extends React.Component {
               >
                 {type === 'instance' ? '实体' : '概念'}
               </span>
-              <span style={{ color: '#24b0e6' }}>{forcename}</span>
+              <span style={{ fontSize: 14, fontWeight: 400 }}>
+                <a href="javascript:;"><Icon type="profile" /></a>
+                <span style={{ margin: '0 10px' }}>分类：</span>
+                {dataSource.filter((e) => { return e.predicatelabel === '分类' }).map((e, index) => {
+                  if (index < dataSource.filter((j) => { return j.predicatelabel === '分类' }).length - 1) {
+                    return (
+                      <span>
+                        {e.object ? e.object : e.objectLabel}
+                        <Divider type="vertical" style={{ backgroundColor: '#bbb' }} />
+                      </span>
+                    )
+                  } else {
+                    return <span>{e.object ? e.object : e.objectLabel}</span>
+                  }
+                })}
+              </span>
+              <span style={{ color: '#000000a6' }}>{forcename}</span>
             </div>
             </div>
             <div style={{ height: 560, overflow: 'hidden' }}>
@@ -646,8 +732,8 @@ class FirstGraph extends React.Component {
                 className={Styles.myCard}
                 id="components-anchor-graph"
                 title={(
-                  <span>
-                    <Icon type="dot-chart" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  <span style={{ color: '#fff' }}> 
+                    <Icon type="dot-chart" style={{ color: '#fff', marginRight: 10 }} />
                     关系图
                   </span>
                 )}
@@ -669,10 +755,10 @@ class FirstGraph extends React.Component {
                       全图
                     </Button>
                     <ButtonGroup style={{ marginRight: 20 }}>
-                      <Button type={showRelation === true ? 'primary' : 'none' } onClick={() => this.setState({ showRelation: true })}>关系图</Button>
-                      <Button type={showRelation === false ? 'primary' : 'none' } onClick={() => this.setState({ showRelation: false })}>思维导图</Button>
+                      <Button type={showRelation === true ? 'danger' : 'none' } onClick={() => this.setState({ showRelation: true })}>关系图</Button>
+                      <Button type={showRelation === false ? 'danger' : 'none' } onClick={() => this.setState({ showRelation: false })}>思维导图</Button>
                     </ButtonGroup>
-                    <Button type="primary" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
+                    <Button type="danger" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
                   </div>
                 )}
               >
@@ -702,7 +788,7 @@ class FirstGraph extends React.Component {
                     </div>
                   </div>
                   <div style={{ height: kgLarger === true ? 600 : 450, display: showRelation === true ? 'none' : 'block' }}>
-                    <Think graph={thinkData} resize={{ kgLarger, showRelation }} />
+                    <Think graph={thinkData} forcename={forcename} select={dataSource} resize={{ kgLarger, showRelation }} />
                   </div>
                 </Spin>
               </Card>
@@ -710,8 +796,8 @@ class FirstGraph extends React.Component {
                 className={Styles.myCard}
                 headStyle={{ height: 64 }}
                 title={(
-                  <span>
-                    <Icon type="file" style={{ color: '#24b0e6', marginRight: 10 }} />
+                  <span style={{ color: '#fff' }}>
+                    <Icon type="file" style={{ color: '#fff', marginRight: 10 }} />
                     属性
                   </span>
                 )}
@@ -735,8 +821,8 @@ class FirstGraph extends React.Component {
               className={Styles.myCard} bordered={false}
               style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
               id="components-anchor-pics" title={(
-                <span>
-                  <Icon type="picture" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                <span style={{ color: '#fff' }}>
+                  <Icon type="picture" theme="filled" style={{ color: '#fff', marginRight: 10 }} />
                   相关图片
                 </span>
             )}
@@ -755,10 +841,10 @@ class FirstGraph extends React.Component {
             </Card>
             <Card
               className={Styles.myCard} bordered={false}
-              style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
+              style={{ margin: 20 }}
               title={(
-                <span>
-                  <Icon type="play-circle" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                <span style={{ color: '#fff' }}>
+                  <Icon type="play-circle" theme="filled" style={{ color: '#fff', marginRight: 10 }} />
                   教学视频
                 </span>
             )}
@@ -776,19 +862,19 @@ class FirstGraph extends React.Component {
             </Card>
             <Card
               className={Styles.myCard} bordered={false}
-              style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 20 }}
+              style={{ margin: 20 }}
               title={(
-                <span>
-                  <Icon type="read" theme="filled" style={{ color: '#24b0e6', marginRight: 10 }} />
+                <span style={{ color: '#fff' }}>
+                  <Icon type="read" theme="filled" style={{ color: '#fff', marginRight: 10 }} />
                   相关习题
                 </span>
             )}
             >
               <Spin spinning={loading}>
-                <Questions />
+                <Questions uri={forcename} />
               </Spin>
             </Card>
-            {this.renderCard(wikiLinks)}
+            {/* {this.renderCard(wikiLinks)} */}
           </div>
         </div>
         <div style={{ position: 'fixed', width: '100%', height: '100%', top: 0, zIndex: 998, display: kgLarger === true ? 'block' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.65)' }} />

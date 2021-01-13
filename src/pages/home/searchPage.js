@@ -1,8 +1,9 @@
 import React from 'react'
-import { Button, AutoComplete, Input, List, Empty, Avatar, Checkbox, Divider } from 'antd'
+import { Button, AutoComplete, Input, List, Empty, Avatar, Checkbox, Divider, Select } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
 import { newSearch } from '@/services/edukg'
+import { searchResult } from '@/services/knowledge'
 import { getUrlParams } from '@/utils/common'
 import kgIcon from '@/assets/kgIcon.png'
 import GrapeImg from '@/assets/grape.png'
@@ -11,12 +12,15 @@ import phyImg from '@/assets/eduIcon/phy.png'
 import chemImg from '@/assets/eduIcon/chem.png'
 import bioImg from '@/assets/eduIcon/bio.png'
 import geoImg from '@/assets/eduIcon/geo.png'
+import subList from '@/constants/subject'
 
 let localCounter = 0
 const plainOptions = [
   { label: '实体', value: 'instance' },
   { label: '概念', value: 'class' },
 ]
+const InputGroup = Input.Group
+const { Option } = Select
 
 @connect()
 class ClusterBroker extends React.Component {
@@ -24,6 +28,7 @@ class ClusterBroker extends React.Component {
     super(props)
     this.state = {
       filter: getUrlParams().filter || '',
+      subject: 'chinese',
       loading: false,
       dataSource: [],
       oriSource: [],
@@ -53,10 +58,11 @@ class ClusterBroker extends React.Component {
     }
   }
 
-  search = async (filter) => {
-    const { selectValue } = this.state
-    this.setState({ loading: true, filter, firstIn: false })
-    const data = await newSearch({
+  search = async (filter, sub) => {
+    const { selectValue, subject } = this.state
+    this.setState({ loading: true, filter, firstIn: false, subject: sub ? sub : subject })
+    const data = await searchResult({
+      subject: sub ? sub : subject,
       searchKey: filter,
     })
     if (data.data) {
@@ -113,26 +119,66 @@ class ClusterBroker extends React.Component {
 
   render() {
     const {
-      dataSource, filter, loading, firstIn, selectValue,
+      dataSource, filter, loading, firstIn, selectValue, subject,
     } = this.state
-    const rtn1 = dataSource.map(i => ({ raw: i, len: i.label }))
-      .sort((p, n) => p.len.indexOf(filter) - n.len.indexOf(filter))
-      .map(i => i.raw)
-    const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
-      .sort((p, n) => p.len - n.len)
-      .map(i => i.raw)
+    // const rtn1 = dataSource.map(i => ({ raw: i, len: i.label }))
+    //   .sort((p, n) => p.len.indexOf(filter) - n.len.indexOf(filter))
+    //   .map(i => i.raw)
+    // const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
+    //   .sort((p, n) => p.len - n.len)
+    //   .map(i => i.raw)
+    const selectItem = <Select
+    style={{
+      width: 80,
+      paddingLeft: 25,
+      // float: 'left',
+      // marginLeft: 30,
+      // marginTop: 10,
+      // height: 40,
+      // lineHeight: '40px',
+      // borderBottomRightRadius: 0,
+      // borderTopRightRadius: 0,
+    }}
+    size="large"
+    value={subject}
+    dropdownMatchSelectWidth
+    onChange={value => this.setState({ subject: value })}
+  >
+    {subList.map((e) => {
+      return <Option style={{ textAlign: 'center' }} key={e.value} value={e.value}>{e.name}</Option>
+    })}
+  </Select>
     return (
-      <div style={{ margin: '0 auto', width: 1200, minHeight: 800, backgroundColor: '#ffffffee', paddingTop: 20 }}>
+      <div style={{ margin: '0 auto', width: 1200, minHeight: 800, backgroundColor: '#fffffff1', paddingTop: 20 }}>
         <div style={{ marginBottom: '0 auto 20px', textAlign: 'center' }}>
           <div style={{ height: 70, width: 900, display: 'inline-block' }}>
             <div style={{ height: 60, display: 'inline-block', float: 'left' }}>
               <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
               <div style={{ fontSize: 36, float: 'left', color: '#6e72df', fontWeight: 700 }}>Edukg</div>
             </div>
+            {/* <Select
+              style={{
+                width: 80,
+                float: 'left',
+                marginLeft: 30,
+                marginTop: 10,
+                height: 40,
+                lineHeight: '40px',
+                borderBottomRightRadius: 0,
+                borderTopRightRadius: 0,
+              }}
+              size="large"
+              value={subject}
+              onChange={value => this.setState({ subject: value })}
+            >
+              {subList.map((e) => {
+                return <Option key={e.value} value={e.value}>{e.name}</Option>
+              })}
+            </Select> */}
             <AutoComplete
               size="large"
               style={{
-                width: 520, float: 'left', marginLeft: 30,
+                width: 520, float: 'left', marginTop: 10, marginLeft: 30,
               }}
               dataSource={[]}
               value={filter}
@@ -145,12 +191,12 @@ class ClusterBroker extends React.Component {
               <Input
                 onPressEnter={e => this.search(e.target.value)}
                 placeholder="请输入基础教育相关知识点"
+                addonBefore={selectItem}
                 style={{
-                  borderBottomRightRadius: 0,
-                  borderTopRightRadius: 0,
-                  height: 60,
-                  lineHeight: '60px',
-                  fontSize: 24,
+                  borderRadius: 0,
+                  height: 40,
+                  lineHeight: '40px',
+                  fontSize: 20,
                   backgroundColor: '#fff',
                 }}
               />
@@ -158,8 +204,9 @@ class ClusterBroker extends React.Component {
             <Button
               style={{
                 float: 'left',
-                width: 180,
-                height: 60,
+                width: 100,
+                height: 40,
+                marginTop: 10,
                 borderBottomLeftRadius: 0,
                 borderTopLeftRadius: 0,
               }}
@@ -172,14 +219,14 @@ class ClusterBroker extends React.Component {
           <br />
           <div style={{ height: 30, width: 900, display: 'inline-block' }}>
             例：
-            <a href="javascript:;" onClick={() => this.search('亚洲')}>亚洲</a>
+            <a href="javascript:;" onClick={() => this.search('亚洲', 'geo')}>亚洲</a>
             <Divider type="vertical" />
-            <a href="javascript:;" onClick={() => this.search('法拉第电磁感应定律')}>法拉第电磁感应定律</a>
+            <a href="javascript:;" onClick={() => this.search('法拉第电磁感应定律', 'physics')}>法拉第电磁感应定律</a>
             <Divider type="vertical" />
-            <a href="javascript:;" onClick={() => this.search('动能、势能的大小变化及判断')}>动能、势能的大小变化及判断</a>
+            <a href="javascript:;" onClick={() => this.search('动能、势能的大小变化及判断', 'physics')}>动能、势能的大小变化及判断</a>
           </div>
           <br />
-          <div
+          {/* <div
             style={{
               display: firstIn === true ? 'none' : 'inline-block',
               width: 900,
@@ -190,11 +237,11 @@ class ClusterBroker extends React.Component {
               options={plainOptions} value={selectValue}
               onChange={this.handleFilter}
             />
-          </div>
+          </div> */}
           <List
             itemLayout="vertical"
             size="large"
-            dataSource={rtn}
+            dataSource={dataSource}
             loading={loading}
             style={{
               // border: '1px solid #e8e8e8',
@@ -210,34 +257,30 @@ class ClusterBroker extends React.Component {
               showQuickJumper: true,
             }}
             renderItem={(item) => {
-              let target2
-              let target3
-              for (const i of item.property) {
-                if (i.type === 'image' || i.object.indexOf('getjpg') > 0 || i.object.indexOf('getpng') > 0) {
-                  if (!target3) {
-                    target3 = i
-                  }
-                }
-                if (i.predicate_label === '分类' && i.object_label.length > 0) {
-                  target2 = i
-                }
-              }
+              // let target2
+              // let target3
+              // for (const i of item.property) {
+              //   if (i.type === 'image' || i.object.indexOf('getjpg') > 0 || i.object.indexOf('getpng') > 0) {
+              //     if (!target3) {
+              //       target3 = i
+              //     }
+              //   }
+              //   if (i.predicate_label === '分类' && i.object_label.length > 0) {
+              //     target2 = i
+              //   }
+              // }
               return (
                 <List.Item style={{ padding: 20 }}>
                   <List.Item.Meta
-                    avatar={target3 ? (
-                      <Avatar size={64} src={target3.object} />
-                    ) : (
-                      <Avatar size={64} src={this.checkAvatar(item.uri)} />
-                    )}
+                    avatar={<Avatar size={64} src={this.checkAvatar(item.entity_uri)} />}
                     title={(
                       <a
                         href="javascript:;"
                         onClick={() => {
-                          window.open(`/newGraph?uri=${escape(item.uri)}&type=${item.type}`)
+                          window.open(`/newGraph?uri=${escape(item.entity_uri)}&type=instance&subject=${subject}`)
                         }}
                       >
-                        {this.handleHighlight(item.label, filter)}
+                        {this.handleHighlight(item.entity_name, filter)}
                       </a>
                     )}
                     description={(
@@ -249,25 +292,26 @@ class ClusterBroker extends React.Component {
                             display: 'inline-block',
                             textAlign: 'center',
                             border: '1px solid',
-                            backgroundColor: item.type === 'instance' ? '#24b0e6' : '#28d100',
-                            borderColor: item.type === 'instance' ? '#24b0e6' : '#28d100',
+                            backgroundColor: '#24b0e6',
+                            borderColor: '#24b0e6',
                             borderRadius: 4,
                             marginRight: 12,
                           }}
                         >
-                          {item.type === 'instance' ? '实体' : '概念'}
+                          {/* {item.type === 'instance' ? '实体' : '概念'} */}
+                          实体
                         </span>
                         <span>
-                          {target2 ? '所属分类：' : ''}
+                          {/* {target2 ? '所属分类：' : ''} */}
                         </span>
                         <span>
-                          {target2 ? target2.object_label.length > 0 ? target2.object_label : target2.object : ''}
+                          {/* {target2 ? target2.object_label.length > 0 ? target2.object_label : target2.object : ''} */}
                         </span>
                       </span>
                     )}
                   />
                   <div style={{ color: '#888', fontSize: 12, marginLeft: 80 }}>
-                    {`uri: ${item.uri}`}
+                    {`uri: ${item.entity_uri}`}
                   </div>
                 </List.Item>
               )

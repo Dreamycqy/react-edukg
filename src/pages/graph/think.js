@@ -12,11 +12,11 @@ export default class GraphChart extends React.Component {
   }
 
   componentDidMount() {
-    const { graph } = this.props
+    const { graph, select } = this.props
     try {
-      this.instance = this.renderChart(this.dom, graph, this.instance)
+      this.instance = this.renderChart(this.dom, graph, select, this.instance)
       resizeListener(this.dom, () => {
-        this.instance = this.renderChart(this.dom, graph, this.instance, true)
+        this.instance = this.renderChart(this.dom, graph, select, this.instance, true)
       })
     } catch (e) {
       console.log(e); // eslint-disable-line
@@ -25,14 +25,14 @@ export default class GraphChart extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const {
-      graph, resize,
+      graph, select, resize,
     } = nextProps
-    return !_.isEqual(graph, this.props.graph) || resize !== this.props.resize
+    return !_.isEqual(graph, this.props.graph) || resize !== this.props.resize || !_.isEqual(select, this.props.select)
   }
 
   componentDidUpdate() {
-    const { graph } = this.props
-    this.instance = this.renderChart(this.dom, graph, this.instance)
+    const { graph, select } = this.props
+    this.instance = this.renderChart(this.dom, graph, select, this.instance)
   }
 
   componentWillUnmount() {
@@ -40,8 +40,46 @@ export default class GraphChart extends React.Component {
     this.instance && this.instance.dispose()  //  eslint-disable-line
   }
 
-  renderChart = (dom, graph, instance, forceUpdate = false) => {
+  pushSelect = (graph, select) => {
+    let time = 0
+    if (graph.children) {
+      graph.children.forEach((e, index) => {
+        if (time === 1) {
+          return
+        } else if (e.name === select.objectLabel) {
+          if (!e.children) {
+            e.children = []
+          }
+          if (e.children.filter((e) => { return e.name === this.props.forcename }).length === 0) {
+            e.children.push({
+              name: this.props.forcename,
+              children: [],
+              itemStyle: {
+                borderWidth: 4,
+              },
+              label: {
+                position: 'right',
+                distance: 8,
+                fontSize: 14,
+                fontWeight: 700,
+              },
+            })
+          }
+          time = 1
+        } else {
+          e = this.pushSelect(e, select)
+        }
+      })
+    }
+    return graph
+  }
+
+  renderChart = (dom, graph, select, instance, forceUpdate = false) => {
     let options
+    const selectOne = select.filter((e) => { return e.predicateLabel === '分类' })
+    if (selectOne.length > 0) {
+      this.pushSelect(graph, selectOne[0])
+    }
     if (!graph) {
       options = {
         ...options,
@@ -58,7 +96,7 @@ export default class GraphChart extends React.Component {
           triggerOn: 'mousemove',
         },
         title: {
-          text: '地球 的相关知识导图',
+          text: this.props.forcename + ' 的相关知识导图',
         },
         series: [
           {
