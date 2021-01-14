@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, Spin, Table, List, Icon, Cascader, Input, Button, Anchor, Modal, Divider, Popover } from 'antd'
+import { Card, Spin, Table, Icon, Input, Button, Anchor, Modal, Divider, Popover } from 'antd'
 import Slider from 'react-slick'
 import 'slick-carousel/slick/slick.css'
 import 'slick-carousel/slick/slick-theme.css'
@@ -10,10 +10,6 @@ import { getUrlParams } from '@/utils/common'
 import Chart from '@/components/charts/graph'
 import { infoByInstanceUri } from '@/services/knowledge'
 import { getGraphBySubandGrade } from '@/services/kgApi'
-import kpchinaTitle from '@/assets/kpchina_title.png'
-import baiduTitle from '@/assets/baidu_title.png'
-import kepuTitle from '@/assets/kepu_title.jpg'
-import kpsourceTitle from '@/assets/kpsource_title.jpg'
 import subList from '@/constants/subject'
 import Think from './think'
 import Questions from './question'
@@ -49,34 +45,6 @@ const columns = [{
   },
 }]
 
-const options = [{
-  value: 'score',
-  label: '相关度',
-  children: [
-    {
-      value: 'desc',
-      label: '倒序',
-    },
-    {
-      value: 'asc',
-      label: '正序',
-    },
-  ],
-}, {
-  value: 'year',
-  label: '出版时间',
-  children: [
-    {
-      value: 'desc',
-      label: '倒序',
-    },
-    {
-      value: 'asc',
-      label: '正序',
-    },
-  ],
-}]
-
 @connect()
 class FirstGraph extends React.Component {
   constructor(props) {
@@ -90,10 +58,8 @@ class FirstGraph extends React.Component {
       dataSource: [],
       loading: false,
       uri: unescape(getUrlParams().uri || ''),
-      filter: ['score', 'desc'],
       searchKey: '',
       imgList: [],
-      wikiLinks: {},
       selectImg: {
         src: '',
         index: 1,
@@ -112,7 +78,7 @@ class FirstGraph extends React.Component {
     }
   }
 
-  componentWillMount = async () => {
+  UNSAFE_componentWillMount = async () => {
     await this.getChart()
     this.getSubKg()
   }
@@ -137,7 +103,6 @@ class FirstGraph extends React.Component {
         loading: false,
         forcename: '',
         dataSource: [],
-        resource: [],
         graph: {
           nodes: [],
           links: [],
@@ -152,9 +117,7 @@ class FirstGraph extends React.Component {
       uri,
     })
     if (data) {
-      const { label, property, paper, content } = data.data
-      const wikiLinks = {}
-      const newProperty = []
+      const { label, property, content } = data.data
       if (graphHistory.length === 0) {
         graphHistory.push({
           name: label,
@@ -228,8 +191,6 @@ class FirstGraph extends React.Component {
       this.setState({
         forcename: label,
         dataSource: property ? this.handleData(property) : [],
-        resource: paper ? paper.data[0].items : [],
-        wikiLinks,
         graphHistory,
         graph: {
           nodes: params.nodes,
@@ -526,100 +487,6 @@ class FirstGraph extends React.Component {
     })
   }
 
-  renderCard = (list) => {
-    const result = []
-    for (const obj in list) { // eslint-disable-line
-      let src = ''
-      if (obj === '科普中国资源') {
-        src = kpchinaTitle
-      } else if (obj === '科学百科词条') {
-        src = baiduTitle
-      } else if (obj.indexOf('中国科普博览') > -1) {
-        src = kepuTitle
-      } else if (obj.indexOf('科普活动资源服务平台') > -1) {
-        src = kpsourceTitle
-      }
-      result.push(
-        <Card
-          id={obj}
-          className={Styles.myCard}
-          style={{ margin: 20 }}
-          title={(
-            <span>
-              {src.length > 0 ? <img alt="" src={src} height="30px" width="100px" /> : null}
-              &nbsp;&nbsp;&nbsp;&nbsp;
-              {obj}
-            </span>
-          )}
-        >
-          <List
-            size="small"
-            pagination={{ size: 'small' }}
-            itemLayout="vertical"
-            expandedRowRender={record => (
-              <div style={{ margin: 0 }}>
-                {this.renderExpand(record.property)}
-              </div>
-            )}
-            dataSource={list[obj]}
-            renderItem={(item) => {
-              const imgTarget = _.find(item.property, { predicate_label: '资源图片' })
-              return (
-                <List.Item
-                  style={{ padding: 10 }}
-                  extra={(
-                    <img
-                      width="240px"
-                      alt="logo"
-                      style={{ display: imgTarget ? 'inline-block' : 'none' }}
-                      src={imgTarget ? imgTarget.object : ''}
-                    />
-                  )}
-                >
-                  <List.Item.Meta
-                    title={(
-                      <a
-                        href="javascript:;"
-                        onClick={() => { window.open(_.find(item.property, { predicate_label: '资源链接' }).object) }}
-                      >
-                        { _.find(item.property, { predicate_label: '资源标题' }).object }
-                      </a>
-                    )}
-                    description={(
-                      <div>
-                        <Icon
-                          type="read"
-                          style={{ marginRight: 8, color: '#fff' }}
-                        />
-                        资源类别：
-                        {_.find(item.property, { predicate_label: '资源类别' }).object}
-                      </div>
-                    )}
-                  />
-                  <div>
-                    {item.property.filter((e) => {
-                      return (e.predicate_label !== '资源标题' && e.predicate_label !== '资源类别' && e.predicate_label !== '资源链接' && e.predicate_label !== '资源图片')
-                    }).map(e => (
-                      <div>
-                        <div style={{ width: 100, textAlign: 'right', display: 'inline-block' }}>
-                          {obj === '科学百科词条' ? e.predicate_label.split('百科infobox_')[1] : e.predicate_label}
-                          ：
-                          {' '}
-                        </div>
-                        <span>{e.object}</span>
-                      </div>
-                    ))}
-                  </div>
-                </List.Item>
-              )
-            }}
-          />
-        </Card>,
-      )
-    }
-    return result
-  }
-
   renderExpand = (objList) => {
     const result = []
     objList.forEach((e) => {
@@ -633,8 +500,7 @@ class FirstGraph extends React.Component {
               ? <img src={e.object} alt="" height="200px" />
               : this.checkUrl(e.object)
                 ? <a href="javascript:;" onClick={() => window.open(e.object)}>{e.object}</a>
-                : <span>{e.object}</span>
-            }
+                : <span>{e.object}</span>}
           </div>
         </div>,
       )
@@ -653,7 +519,7 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      forcename, dataSource, loading, searchKey, kgLarger, uri, subject, thinkData,
+      forcename, dataSource, loading, searchKey, kgLarger, subject, thinkData,
       imgList, selectImg, modalVisible, graph, type, graphHistory, showRelation,
     } = this.state
     return (
@@ -662,77 +528,77 @@ class FirstGraph extends React.Component {
           <div>
             <div style={{ height: 80, overflow: 'hidden' }}>
               <div style={{ height: 60, margin: '10px 20px 0 0', float: 'right' }}>
-              <Input
-                value={searchKey}
-                onChange={e => this.setState({ searchKey: e.target.value })}
-                onPressEnter={e => this.handleJump(e.target.value)}
-                placeholder="请输入基础教育相关知识点"
-                addonBefore={<div>{_.find(subList, { value: subject }).name}</div>}
-                style={{
-                  borderBottomRightRadius: 0,
-                  borderTopRightRadius: 0,
-                  width: 500,
-                  height: 40,
-                  lineHeight: '40px',
-                  fontSize: 20,
-                }}
-                size="large"
-              />
-              <Button
-                style={{
-                  float: 'right',
-                  height: 40,
-                  borderBottomLeftRadius: 0,
-                  borderTopLeftRadius: 0,
-                }}
-                type="primary" size="large"
-                onClick={() => this.handleJump(searchKey)}
-              >
-                搜索
-              </Button>
-            </div>
+                <Input
+                  value={searchKey}
+                  onChange={(e) => this.setState({ searchKey: e.target.value })}
+                  onPressEnter={(e) => this.handleJump(e.target.value)}
+                  placeholder="请输入基础教育相关知识点"
+                  addonBefore={<div>{_.find(subList, { value: subject }).name}</div>}
+                  style={{
+                    borderBottomRightRadius: 0,
+                    borderTopRightRadius: 0,
+                    width: 500,
+                    height: 40,
+                    lineHeight: '40px',
+                    fontSize: 20,
+                  }}
+                  size="large"
+                />
+                <Button
+                  style={{
+                    float: 'right',
+                    height: 40,
+                    borderBottomLeftRadius: 0,
+                    borderTopLeftRadius: 0,
+                  }}
+                  type="primary" size="large"
+                  onClick={() => this.handleJump(searchKey)}
+                >
+                  搜索
+                </Button>
+              </div>
               <div style={{ marginLeft: 30, fontSize: 20, fontWeight: 700, float: 'left' }}>
-              <span
-                style={{
-                  marginTop: 10,
-                  color: 'white',
-                  padding: '2px 20px',
-                  display: 'inline-block',
-                  textAlign: 'center',
-                  border: '1px solid',
-                  backgroundColor: type === 'instance' ? '#24b0e6' : '#28d100',
-                  borderColor: type === 'instance' ? '#24b0e6' : '#28d100',
-                  borderRadius: 4,
-                  marginRight: 12,
-                }}
-              >
-                {type === 'instance' ? '实体' : '概念'}
-              </span>
-              <span style={{ fontSize: 14, fontWeight: 400 }}>
-                <a href="javascript:;"><Icon type="profile" /></a>
-                <span style={{ margin: '0 10px' }}>分类：</span>
-                {dataSource.filter((e) => { return e.predicatelabel === '分类' }).map((e, index) => {
-                  if (index < dataSource.filter((j) => { return j.predicatelabel === '分类' }).length - 1) {
-                    return (
-                      <span>
-                        {e.object ? e.object : e.objectLabel}
-                        <Divider type="vertical" style={{ backgroundColor: '#bbb' }} />
-                      </span>
-                    )
-                  } else {
-                    return <span>{e.object ? e.object : e.objectLabel}</span>
-                  }
-                })}
-              </span>
-              <span style={{ color: '#000000a6' }}>{forcename}</span>
-            </div>
+                <span
+                  style={{
+                    marginTop: 10,
+                    color: 'white',
+                    padding: '2px 20px',
+                    display: 'inline-block',
+                    textAlign: 'center',
+                    border: '1px solid',
+                    backgroundColor: type === 'instance' ? '#24b0e6' : '#28d100',
+                    borderColor: type === 'instance' ? '#24b0e6' : '#28d100',
+                    borderRadius: 4,
+                    marginRight: 12,
+                  }}
+                >
+                  {type === 'instance' ? '实体' : '概念'}
+                </span>
+                <span style={{ fontSize: 14, fontWeight: 400 }}>
+                  <a href="javascript:;"><Icon type="profile" /></a>
+                  <span style={{ margin: '0 10px' }}>分类：</span>
+                  {dataSource.filter((e) => { return e.predicatelabel === '分类' }).map((e, index) => {
+                    if (index < dataSource.filter((j) => { return j.predicatelabel === '分类' }).length - 1) {
+                      return (
+                        <span>
+                          {e.object ? e.object : e.objectLabel}
+                          <Divider type="vertical" style={{ backgroundColor: '#bbb' }} />
+                        </span>
+                      )
+                    } else {
+                      return <span>{e.object ? e.object : e.objectLabel}</span>
+                    }
+                  })}
+                </span>
+                <span style={{ color: '#000000a6' }}>{forcename}</span>
+              </div>
             </div>
             <div style={{ height: 560, overflow: 'hidden' }}>
               <Card
                 className={Styles.myCard}
                 id="components-anchor-graph"
                 title={(
-                  <span style={{ color: '#fff' }}> 
+                  <span style={{ color: '#fff' }}>
                     <Icon type="dot-chart" style={{ color: '#fff', marginRight: 10 }} />
                     关系图
                   </span>
@@ -755,8 +621,8 @@ class FirstGraph extends React.Component {
                       全图
                     </Button>
                     <ButtonGroup style={{ marginRight: 20 }}>
-                      <Button type={showRelation === true ? 'danger' : 'none' } onClick={() => this.setState({ showRelation: true })}>关系图</Button>
-                      <Button type={showRelation === false ? 'danger' : 'none' } onClick={() => this.setState({ showRelation: false })}>思维导图</Button>
+                      <Button type={showRelation === true ? 'danger' : 'none'} onClick={() => this.setState({ showRelation: true })}>关系图</Button>
+                      <Button type={showRelation === false ? 'danger' : 'none'} onClick={() => this.setState({ showRelation: false })}>思维导图</Button>
                     </ButtonGroup>
                     <Button type="danger" onClick={() => this.setState({ kgLarger: !kgLarger })}>{kgLarger === true ? '还原' : '放大'}</Button>
                   </div>
@@ -773,8 +639,7 @@ class FirstGraph extends React.Component {
                           >
                             {index === graphHistory.length - 1
                               ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-                              : <div style={{ width: 24, display: 'inline-block' }} />
-                            }
+                              : <div style={{ width: 24, display: 'inline-block' }} />}
                             {e.name}
                           </a>
                         </div>
@@ -782,13 +647,17 @@ class FirstGraph extends React.Component {
                     </div>
                     <div style={{ height: kgLarger === true ? 600 : 450, width: kgLarger === true ? 1000 : 'auto', overflow: 'hidden' }}>
                       <Chart
-                        graph={graph} forcename={forcename} resize={{ kgLarger, showRelation }}
+                        graph={graph} forcename={forcename}
+                        resize={{ kgLarger, showRelation }}
                         handleExpandGraph={this.handleExpandGraph}
                       />
                     </div>
                   </div>
                   <div style={{ height: kgLarger === true ? 600 : 450, display: showRelation === true ? 'none' : 'block' }}>
-                    <Think graph={thinkData} forcename={forcename} select={dataSource} resize={{ kgLarger, showRelation }} />
+                    <Think
+                      graph={thinkData} forcename={forcename}
+                      select={dataSource} resize={{ kgLarger, showRelation }}
+                    />
                   </div>
                 </Spin>
               </Card>
@@ -813,7 +682,7 @@ class FirstGraph extends React.Component {
                   showHeader={false}
                   pagination={false}
                   scroll={{ y: 450 }}
-                  rowKey={record => record.propertyname}
+                  rowKey={(record) => record.propertyname}
                 />
               </Card>
             </div>
@@ -853,7 +722,7 @@ class FirstGraph extends React.Component {
                 <div style={{ height: 280 }}>
                   <div style={{ padding: 10 }}>
                     <a href="http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_detail&courseId=5230008" target="_blank">
-                      <img src="https://edu.10086.cn/files/webupload//course/new/1599041949142.png" height="240px" width="360px" alt=""/>
+                      <img src="https://edu.10086.cn/files/webupload//course/new/1599041949142.png" height="240px" width="360px" alt="" />
                       <p style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>高一地理秋季同步班</p>
                     </a>
                   </div>
@@ -874,7 +743,6 @@ class FirstGraph extends React.Component {
                 <Questions uri={forcename} />
               </Spin>
             </Card>
-            {/* {this.renderCard(wikiLinks)} */}
           </div>
         </div>
         <div style={{ position: 'fixed', width: '100%', height: '100%', top: 0, zIndex: 998, display: kgLarger === true ? 'block' : 'none', backgroundColor: 'rgba(0, 0, 0, 0.65)' }} />

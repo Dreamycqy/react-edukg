@@ -12,17 +12,17 @@ class StudentPersona extends React.Component {
     }
   }
 
-  componentWillMount = () => {
+  UNSAFE_componentWillMount = () => {
     this.getQs(this.props.uri)
   }
 
-  componentWillReceiveProps = (nextProps) => {
+  UNSAFE_componentWillReceiveProps = (nextProps) => {
     if (nextProps.uri !== this.props.uri) {
       this.getQs(nextProps.uri)
     }
   }
 
-  getQs = async(uri) => {
+  getQs = async (uri) => {
     this.setState({
       test: [],
       answerValue: {},
@@ -34,7 +34,7 @@ class StudentPersona extends React.Component {
       uriName: uri,
     })
     if (data) {
-      let test = []
+      const test = []
       let temp1 = ''
       let temp2 = ''
       let temp3 = ''
@@ -99,15 +99,27 @@ class StudentPersona extends React.Component {
           </h3>
           <Radio.Group
             value={answerValue[item.id]}
-            onChange={e => this.handleQuestion(e.target.value, item.id)}
+            onChange={(e) => this.handleQuestion(e.target.value, item.id)}
           >
-            <Radio value="A">A. {a}</Radio>
+            <Radio value="A">
+              A.
+              {a}
+            </Radio>
             <br />
-            <Radio value="B">B. {b}</Radio>
+            <Radio value="B">
+              B.
+              {b}
+            </Radio>
             <br />
-            <Radio value="C">C. {c}</Radio>
+            <Radio value="C">
+              C.
+              {c}
+            </Radio>
             <br />
-            <Radio value="D">D. {d}</Radio>
+            <Radio value="D">
+              D.
+              {d}
+            </Radio>
           </Radio.Group>
         </div>,
       )

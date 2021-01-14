@@ -108,7 +108,7 @@ class FirstGraph extends React.Component {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getTree()
   }
 
@@ -271,7 +271,7 @@ class FirstGraph extends React.Component {
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i]
       if (node.children) {
-        if (node.children.some(item => item.uri === uri)) {
+        if (node.children.some((item) => item.uri === uri)) {
           parentKey.push(node.uri)
         } else {
           this.getParentKey(uri, node.children)
@@ -493,7 +493,7 @@ class FirstGraph extends React.Component {
             size="small"
             pagination={false}
             itemLayout="vertical"
-            expandedRowRender={record => (
+            expandedRowRender={(record) => (
               <div style={{ margin: 0 }}>
                 {this.renderExpand(record.propety)}
               </div>
@@ -536,7 +536,7 @@ class FirstGraph extends React.Component {
                   <div>
                     {item.propety.filter((e) => {
                       return (e.predicate_label !== '资源标题' && e.predicate_label !== '资源类别' && e.predicate_label !== '资源链接' && e.predicate_label !== '资源图片')
-                    }).map(e => (
+                    }).map((e) => (
                       <div>
                         <div style={{ width: 100, textAlign: 'right', display: 'inline-block' }}>
                           {obj === '科学百科词条' ? e.predicate_label.split('百科infobox_')[1] : e.predicate_label}
@@ -570,8 +570,7 @@ class FirstGraph extends React.Component {
               ? <img src={e.object} alt="" height="200px" />
               : this.checkUrl(e.object)
                 ? <a href="javascript:;" onClick={() => window.open(e.object)}>{e.object}</a>
-                : <span>{e.object}</span>
-            }
+                : <span>{e.object}</span>}
           </div>
         </div>,
       )
@@ -663,8 +662,8 @@ class FirstGraph extends React.Component {
             </div>
             <Input
               value={searchKey}
-              onChange={e => this.setState({ searchKey: e.target.value })}
-              onPressEnter={e => this.handleJump(e.target.value)}
+              onChange={(e) => this.setState({ searchKey: e.target.value })}
+              onPressEnter={(e) => this.handleJump(e.target.value)}
               placeholder="请输入科学教育相关知识点"
               style={{
                 borderBottomRightRadius: 0,
@@ -770,7 +769,7 @@ class FirstGraph extends React.Component {
                 className={Styles.myTable}
                 showHeader={false}
                 pagination={false}
-                rowKey={record => record.propertyname}
+                rowKey={(record) => record.propertyname}
               />
             </Card>
             <Card className={Styles.myCard} style={{ display: imgList.length === 0 ? 'none' : 'block', margin: 10 }} id="components-anchor-pics" title="相关图片">
@@ -797,7 +796,7 @@ class FirstGraph extends React.Component {
                   options={options}
                   value={filter}
                   rows={4}
-                  onChange={value => this.setState({ filter: value })}
+                  onChange={(value) => this.setState({ filter: value })}
                   allowClear={false}
                 />
               )}
@@ -839,8 +838,7 @@ class FirstGraph extends React.Component {
                                 : !item.venue.info.name_zh ? '未知'
                                   : item.venue.info.name_zh.length === 0 ? '未知'
                                     : item.venue.info.name
-                                      ? item.venue.info.name : '未知'
-                            }
+                                      ? item.venue.info.name : '未知'}
                             &nbsp;&nbsp;&nbsp;&nbsp;
                             <Icon
                               type="clock-circle"

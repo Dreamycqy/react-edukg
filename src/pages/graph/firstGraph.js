@@ -61,7 +61,7 @@ class FirstGraph extends React.Component {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getData()
   }
 
@@ -165,7 +165,7 @@ class FirstGraph extends React.Component {
             size="small"
             showHeader={false}
             pagination={false}
-            rowKey={record => (subject === 'math' ? record.propertyname + record.instname : record.key + record.value)}
+            rowKey={(record) => (subject === 'math' ? record.propertyname + record.instname : record.key + record.value)}
           />
         </Card>
         <Card style={{ margin: 30 }} title={locale === 'cn' ? '知识来源' : 'resource'}>

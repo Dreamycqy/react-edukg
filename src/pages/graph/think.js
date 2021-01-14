@@ -27,7 +27,9 @@ export default class GraphChart extends React.Component {
     const {
       graph, select, resize,
     } = nextProps
-    return !_.isEqual(graph, this.props.graph) || resize !== this.props.resize || !_.isEqual(select, this.props.select)
+    return !_.isEqual(graph, this.props.graph)
+      || resize !== this.props.resize
+      || !_.isEqual(select, this.props.select)
   }
 
   componentDidUpdate() {
@@ -43,31 +45,31 @@ export default class GraphChart extends React.Component {
   pushSelect = (graph, select) => {
     let time = 0
     if (graph.children) {
-      graph.children.forEach((e, index) => {
-        if (time === 1) {
-          return
-        } else if (e.name === select.objectLabel) {
-          if (!e.children) {
-            e.children = []
+      graph.children.forEach((e) => {
+        if (time !== 1) {
+          if (e.name === select.objectLabel) {
+            if (!e.children) {
+              e.children = []
+            }
+            if (e.children.filter((j) => { return j.name === this.props.forcename }).length === 0) {
+              e.children.push({
+                name: this.props.forcename,
+                children: [],
+                itemStyle: {
+                  borderWidth: 4,
+                },
+                label: {
+                  position: 'right',
+                  distance: 8,
+                  fontSize: 14,
+                  fontWeight: 700,
+                },
+              })
+            }
+            time = 1
+          } else {
+            e = this.pushSelect(e, select)
           }
-          if (e.children.filter((e) => { return e.name === this.props.forcename }).length === 0) {
-            e.children.push({
-              name: this.props.forcename,
-              children: [],
-              itemStyle: {
-                borderWidth: 4,
-              },
-              label: {
-                position: 'right',
-                distance: 8,
-                fontSize: 14,
-                fontWeight: 700,
-              },
-            })
-          }
-          time = 1
-        } else {
-          e = this.pushSelect(e, select)
         }
       })
     }
@@ -96,7 +98,7 @@ export default class GraphChart extends React.Component {
           triggerOn: 'mousemove',
         },
         title: {
-          text: this.props.forcename + ' 的相关知识导图',
+          text: `${this.props.forcename} 的相关知识导图`,
         },
         series: [
           {
@@ -150,7 +152,7 @@ export default class GraphChart extends React.Component {
 
   render() {
     return (
-      <div className="e-charts-graph" ref={t => this.dom = t} style={{ height: '100%', width: '100%' }} />
+      <div className="e-charts-graph" ref={(t) => this.dom = t} style={{ height: '100%', width: '100%' }} />
     )
   }
 }

@@ -18,7 +18,7 @@ class GraphTree extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.generateList(nextProps.treeData)
     if (nextProps.uri !== '') {
       this.setState({ selectKey: nextProps.uri })
@@ -69,7 +69,7 @@ class GraphTree extends React.Component {
     for (let i = 0; i < tree.length; i++) {
       const node = tree[i]
       if (node.children && node.children !== undefined) {
-        if (node.children.some(item => item.uri === uri)) {
+        if (node.children.some((item) => item.uri === uri)) {
           parentKey.push(node.uri)
         } else {
           this.getParentKey(uri, node.children)

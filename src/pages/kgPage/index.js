@@ -32,7 +32,6 @@ class FirstGraph extends React.Component {
       },
       rawData: [],
       treeData: [],
-      thinkData: [],
       loadingChart: false,
       showSingle: false,
       uri: '',
@@ -42,7 +41,7 @@ class FirstGraph extends React.Component {
     }
   }
 
-  componentWillMount = () => {
+  UNSAFE_componentWillMount = () => {
     const { key, type } = getUrlParams()
     if (type === 'subject') {
       this.setState({ subject: key })
@@ -156,7 +155,10 @@ class FirstGraph extends React.Component {
 
   handleShowSingle = async (showSingle) => {
     await this.setState({ showSingle })
-    this.setState({ graph: this.generateGraph(), treeData: this.generateData(), thinkData: this.generateData() })
+    this.setState({
+      graph: this.generateGraph(),
+      treeData: this.generateData(),
+    })
   }
 
   handleGraphData = (array) => {
@@ -222,7 +224,7 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      graph, loadingChart, showRelation, thinkData,
+      graph, loadingChart, showRelation,
       subject, gradeLevel, showSingle, uri, treeData,
     } = this.state
     const { locale } = this.props
@@ -247,13 +249,13 @@ class FirstGraph extends React.Component {
         <div style={{ paddingLeft: 10 }}>
           <Select
             style={{ marginRight: 20, width: 160 }} value={subject}
-            onChange={value => this.setState({ subject: value }, () => this.getChartData())}
+            onChange={(value) => this.setState({ subject: value }, () => this.getChartData())}
           >
             {makeOption(subjectList)}
           </Select>
           <Select
             style={{ marginRight: 20, width: 240 }} value={gradeLevel}
-            onChange={value => this.setState({ gradeLevel: value }, () => this.getChartData())}
+            onChange={(value) => this.setState({ gradeLevel: value }, () => this.getChartData())}
           >
             {makeOption(gradeList)}
           </Select>

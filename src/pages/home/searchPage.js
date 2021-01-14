@@ -1,8 +1,7 @@
 import React from 'react'
-import { Button, AutoComplete, Input, List, Empty, Avatar, Checkbox, Divider, Select } from 'antd'
+import { Button, AutoComplete, Input, List, Empty, Avatar, Divider, Select } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
-import { newSearch } from '@/services/edukg'
 import { searchResult } from '@/services/knowledge'
 import { getUrlParams } from '@/utils/common'
 import kgIcon from '@/assets/kgIcon.png'
@@ -15,11 +14,6 @@ import geoImg from '@/assets/eduIcon/geo.png'
 import subList from '@/constants/subject'
 
 let localCounter = 0
-const plainOptions = [
-  { label: '实体', value: 'instance' },
-  { label: '概念', value: 'class' },
-]
-const InputGroup = Input.Group
 const { Option } = Select
 
 @connect()
@@ -37,7 +31,7 @@ class ClusterBroker extends React.Component {
     }
   }
 
-  componentWillMount = () => {
+  UNSAFE_componentWillMount = () => {
     const { filter } = this.state
     if (filter.length > 0) {
       this.search(filter)
@@ -60,9 +54,9 @@ class ClusterBroker extends React.Component {
 
   search = async (filter, sub) => {
     const { selectValue, subject } = this.state
-    this.setState({ loading: true, filter, firstIn: false, subject: sub ? sub : subject })
+    this.setState({ loading: true, filter, firstIn: false, subject: sub || subject })
     const data = await searchResult({
-      subject: sub ? sub : subject,
+      subject: sub || subject,
       searchKey: filter,
     })
     if (data.data) {
@@ -119,7 +113,7 @@ class ClusterBroker extends React.Component {
 
   render() {
     const {
-      dataSource, filter, loading, firstIn, selectValue, subject,
+      dataSource, filter, loading, firstIn, subject,
     } = this.state
     // const rtn1 = dataSource.map(i => ({ raw: i, len: i.label }))
     //   .sort((p, n) => p.len.indexOf(filter) - n.len.indexOf(filter))
@@ -127,27 +121,29 @@ class ClusterBroker extends React.Component {
     // const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
     //   .sort((p, n) => p.len - n.len)
     //   .map(i => i.raw)
-    const selectItem = <Select
-    style={{
-      width: 80,
-      paddingLeft: 25,
-      // float: 'left',
-      // marginLeft: 30,
-      // marginTop: 10,
-      // height: 40,
-      // lineHeight: '40px',
-      // borderBottomRightRadius: 0,
-      // borderTopRightRadius: 0,
-    }}
-    size="large"
-    value={subject}
-    dropdownMatchSelectWidth
-    onChange={value => this.setState({ subject: value })}
-  >
-    {subList.map((e) => {
-      return <Option style={{ textAlign: 'center' }} key={e.value} value={e.value}>{e.name}</Option>
-    })}
-  </Select>
+    const selectItem = (
+      <Select
+        style={{
+          width: 80,
+          paddingLeft: 25,
+          // float: 'left',
+          // marginLeft: 30,
+          // marginTop: 10,
+          // height: 40,
+          // lineHeight: '40px',
+          // borderBottomRightRadius: 0,
+          // borderTopRightRadius: 0,
+        }}
+        size="large"
+        value={subject}
+        dropdownMatchSelectWidth
+        onChange={(value) => this.setState({ subject: value })}
+      >
+        {subList.map((e) => {
+          return <Option style={{ textAlign: 'center' }} key={e.value} value={e.value}>{e.name}</Option>
+        })}
+      </Select>
+    )
     return (
       <div style={{ margin: '0 auto', width: 1200, minHeight: 800, backgroundColor: '#fffffff1', paddingTop: 20 }}>
         <div style={{ marginBottom: '0 auto 20px', textAlign: 'center' }}>
@@ -182,14 +178,14 @@ class ClusterBroker extends React.Component {
               }}
               dataSource={[]}
               value={filter}
-              onChange={value => this.handleInputChange(value, 'search')}
-              onSelect={value => this.setState({ filter: value })}
+              onChange={(value) => this.handleInputChange(value, 'search')}
+              onSelect={(value) => this.setState({ filter: value })}
               backfill
               optionLabelProp="value"
               defaultActiveFirstOption={false}
             >
               <Input
-                onPressEnter={e => this.search(e.target.value)}
+                onPressEnter={(e) => this.search(e.target.value)}
                 placeholder="请输入基础教育相关知识点"
                 addonBefore={selectItem}
                 style={{
@@ -257,18 +253,6 @@ class ClusterBroker extends React.Component {
               showQuickJumper: true,
             }}
             renderItem={(item) => {
-              // let target2
-              // let target3
-              // for (const i of item.property) {
-              //   if (i.type === 'image' || i.object.indexOf('getjpg') > 0 || i.object.indexOf('getpng') > 0) {
-              //     if (!target3) {
-              //       target3 = i
-              //     }
-              //   }
-              //   if (i.predicate_label === '分类' && i.object_label.length > 0) {
-              //     target2 = i
-              //   }
-              // }
               return (
                 <List.Item style={{ padding: 20 }}>
                   <List.Item.Meta
@@ -298,14 +282,7 @@ class ClusterBroker extends React.Component {
                             marginRight: 12,
                           }}
                         >
-                          {/* {item.type === 'instance' ? '实体' : '概念'} */}
                           实体
-                        </span>
-                        <span>
-                          {/* {target2 ? '所属分类：' : ''} */}
-                        </span>
-                        <span>
-                          {/* {target2 ? target2.object_label.length > 0 ? target2.object_label : target2.object : ''} */}
                         </span>
                       </span>
                     )}
@@ -328,7 +305,8 @@ class ClusterBroker extends React.Component {
           <div style={{ display: 'inline-block' }}>
             <img src={kgIcon} alt="" width="200px" style={{ float: 'left' }} />
             <div style={{ width: 560, overflow: 'hidden', paddingTop: 10, paddingLeft: 50 }}>
-            本知识图谱是一个大规模的基础教育领域的知识图谱，它提供了基础教育领域中的多维知识描述， 还包含与其他基础教育文本资源的实体连接。 另外，本知识图谱是基于基础教育领域权威的教材教辅资料和海量的互联网文本资源，通过知识图谱构建技术构建得到， 所包含的内容非常丰富。可以通过知识图谱的搜索功能进行实体搜索，搜索结果既展示了该实体与其他实体的关系，也展示了该实体的所有属性及知识来源。
+              {/* eslint-disable-next-line max-len */}
+              本知识图谱是一个大规模的基础教育领域的知识图谱，它提供了基础教育领域中的多维知识描述， 还包含与其他基础教育文本资源的实体连接。 另外，本知识图谱是基于基础教育领域权威的教材教辅资料和海量的互联网文本资源，通过知识图谱构建技术构建得到， 所包含的内容非常丰富。可以通过知识图谱的搜索功能进行实体搜索，搜索结果既展示了该实体与其他实体的关系，也展示了该实体的所有属性及知识来源。
             </div>
             <Button
               style={{ marginTop: 20, marginLeft: 10 }}

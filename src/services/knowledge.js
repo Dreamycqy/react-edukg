@@ -17,9 +17,17 @@ export function searchResult(body, rSymbol) {
   })
 }
 
-export function infoByInstanceUri(body, rSymbol) {
+export function searchByKnowId(body, rSymbol) {
   return request.get({
-    url: '/api/knowledge/wiki/infoByInstanceUri',
+    url: '/api/knowledge/wiki/searchByKnowId',
+    data: body,
+    rSymbol,
+  })
+}
+
+export function searchByKnowName(body, rSymbol) {
+  return request.get({
+    url: '/api/knowledge/wiki/searchByKnowName',
     data: body,
     rSymbol,
   })

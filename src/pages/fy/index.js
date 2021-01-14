@@ -69,7 +69,7 @@ class SearchPage extends React.Component {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.state.searchKey.length > 0) {
       this.handleSearch()
     }
