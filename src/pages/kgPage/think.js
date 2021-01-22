@@ -2,6 +2,7 @@ import React from 'react'
 import echarts from 'echarts'
 import _ from 'lodash'
 import resizeListener, { unbind } from 'element-resize-event'
+import subList from '@/constants/subject'
 // import color from '@/constants/colorList'
 
 export default class GraphChart extends React.Component {
@@ -23,15 +24,8 @@ export default class GraphChart extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps) {
-    const {
-      graph, resize,
-    } = nextProps
-    return !_.isEqual(graph, this.props.graph) || resize !== this.props.resize
-  }
-
-  componentDidUpdate() {
-    const { graph } = this.props
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const { graph } = nextProps
     this.instance = this.renderChart(this.dom, graph, this.instance)
   }
 
@@ -40,8 +34,66 @@ export default class GraphChart extends React.Component {
     this.instance && this.instance.dispose()  //  eslint-disable-line
   }
 
+  handleCmcc = (list, subjectName) => {
+    console.log(list)
+    const result = []
+    const map = {
+      3: {},
+      4: {},
+      5: {},
+      6: {},
+    }
+    list.forEach((e) => {
+      if (!map[e['层级节点']][e['知识点编码']]) {
+        map[e['层级节点']][e['知识点编码']] = {
+          ...e,
+          name: e['知识点名称'],
+          key: e['知识点编码'],
+          children: [],
+          type: e['层级节点'] === '6' ? 'instance' : 'category',
+          collapsed: true,
+          label: {
+            fontWeight: e['层级节点'] === '6' ? 700 : null,
+            position: 'bottom',
+            rotate: 0,
+            fontSize: 18,
+          },
+        }
+      }
+    })
+    for (const i in map['6']) { // eslint-disable-line
+      const code = map['6'][i]['知识点编码']
+      const father = code.substr(0, code.length - 3)
+      if (map['5'][father]) {
+        map['5'][father].children.push(map['6'][i])
+      }
+    }
+    for (const i in map['5']) { // eslint-disable-line
+      const code = map['5'][i]['知识点编码']
+      const father = code.substr(0, code.length - 3)
+      if (map['4'][father]) {
+        map['4'][father].children.push(map['5'][i])
+      }
+    }
+    for (const i in map['4']) { // eslint-disable-line
+      const code = map['4'][i]['知识点编码']
+      const father = code.substr(0, code.length - 3)
+      if (map['3'][father]) {
+        map['3'][father].children.push(map['4'][i])
+      }
+    }
+    for (const i in map['3']) { // eslint-disable-line
+      result.push(map['3'][i])
+    }
+    return {
+      name: subjectName,
+      key: subjectName,
+      children: result,
+    }
+  }
+
   renderChart = (dom, graph, instance, forceUpdate = false) => {
-    console.log(graph)
+    const that = this
     let options
     if (!graph) {
       options = {
@@ -53,6 +105,12 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
+      const { subject } = this.props
+      const subjectName = _.find(subList, { value: subject }).name
+      const data = graph.filter((e) => {
+        return e['学科名称'] === subjectName
+      })
+      const result = this.handleCmcc(data, subjectName)
       options = {
         tooltip: {
           trigger: 'item',
@@ -62,8 +120,8 @@ export default class GraphChart extends React.Component {
           {
             type: 'tree',
 
-            data: graph,
-
+            data: result.children.length > 0 ? [result] : [],
+            layout: 'radial',
             top: '1%',
             left: '7%',
             bottom: '1%',
@@ -105,6 +163,12 @@ export default class GraphChart extends React.Component {
     myChart.clear()
     myChart.resize()
     myChart.setOption(options)
+    if (myChart._$handlers.click) { // eslint-disable-line
+      myChart._$handlers.click.length = 0 // eslint-disable-line
+    }
+    myChart.on('click', (params) => {
+      that.props.getNewInstance(params.data['知识点编码'])
+    })
     return myChart
   }
 

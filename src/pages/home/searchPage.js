@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, AutoComplete, Input, List, Empty, Avatar, Divider, Select } from 'antd'
 import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
-import { searchResult } from '@/services/knowledge'
+import { searchResultV3 } from '@/services/knowledge'
 import { getUrlParams } from '@/utils/common'
 import kgIcon from '@/assets/kgIcon.png'
 import GrapeImg from '@/assets/grape.png'
@@ -38,14 +38,15 @@ class ClusterBroker extends React.Component {
     }
   }
 
-  checkAvatar = (uri) => {
-    if (uri.indexOf('geo#') > -1) {
+  checkAvatar = () => {
+    const { subject } = this.state
+    if (subject === 'geo') {
       return geoImg
-    } else if (uri.indexOf('biology#') > -1) {
+    } else if (subject === 'biology') {
       return bioImg
-    } else if (uri.indexOf('physics#') > -1) {
+    } else if (subject === 'physics') {
       return phyImg
-    } else if (uri.indexOf('chemistry#') > -1) {
+    } else if (subject === 'chemistry') {
       return chemImg
     } else {
       return noteImg
@@ -55,7 +56,7 @@ class ClusterBroker extends React.Component {
   search = async (filter, sub) => {
     const { selectValue, subject } = this.state
     this.setState({ loading: true, filter, firstIn: false, subject: sub || subject })
-    const data = await searchResult({
+    const data = await searchResultV3({
       subject: sub || subject,
       searchKey: filter,
     })
@@ -115,24 +116,11 @@ class ClusterBroker extends React.Component {
     const {
       dataSource, filter, loading, firstIn, subject,
     } = this.state
-    // const rtn1 = dataSource.map(i => ({ raw: i, len: i.label }))
-    //   .sort((p, n) => p.len.indexOf(filter) - n.len.indexOf(filter))
-    //   .map(i => i.raw)
-    // const rtn = rtn1.map(i => ({ raw: i, len: i.label.length }))
-    //   .sort((p, n) => p.len - n.len)
-    //   .map(i => i.raw)
     const selectItem = (
       <Select
         style={{
           width: 80,
           paddingLeft: 25,
-          // float: 'left',
-          // marginLeft: 30,
-          // marginTop: 10,
-          // height: 40,
-          // lineHeight: '40px',
-          // borderBottomRightRadius: 0,
-          // borderTopRightRadius: 0,
         }}
         size="large"
         value={subject}
@@ -152,25 +140,6 @@ class ClusterBroker extends React.Component {
               <img style={{ float: 'left' }} src={GrapeImg} alt="" height="60px" />
               <div style={{ fontSize: 36, float: 'left', color: '#6e72df', fontWeight: 700 }}>Edukg</div>
             </div>
-            {/* <Select
-              style={{
-                width: 80,
-                float: 'left',
-                marginLeft: 30,
-                marginTop: 10,
-                height: 40,
-                lineHeight: '40px',
-                borderBottomRightRadius: 0,
-                borderTopRightRadius: 0,
-              }}
-              size="large"
-              value={subject}
-              onChange={value => this.setState({ subject: value })}
-            >
-              {subList.map((e) => {
-                return <Option key={e.value} value={e.value}>{e.name}</Option>
-              })}
-            </Select> */}
             <AutoComplete
               size="large"
               style={{
@@ -222,25 +191,12 @@ class ClusterBroker extends React.Component {
             <a href="javascript:;" onClick={() => this.search('动能、势能的大小变化及判断', 'physics')}>动能、势能的大小变化及判断</a>
           </div>
           <br />
-          {/* <div
-            style={{
-              display: firstIn === true ? 'none' : 'inline-block',
-              width: 900,
-              textAlign: 'left',
-            }}
-          >
-            <Checkbox.Group
-              options={plainOptions} value={selectValue}
-              onChange={this.handleFilter}
-            />
-          </div> */}
           <List
             itemLayout="vertical"
             size="large"
             dataSource={dataSource}
             loading={loading}
             style={{
-              // border: '1px solid #e8e8e8',
               width: 900,
               display: dataSource.length > 0 || loading === true ? 'block' : 'none',
               backgroundColor: '#ffffffa6',
@@ -256,12 +212,12 @@ class ClusterBroker extends React.Component {
               return (
                 <List.Item style={{ padding: 20 }}>
                   <List.Item.Meta
-                    avatar={<Avatar size={64} src={this.checkAvatar(item.entity_uri)} />}
+                    avatar={<Avatar size={64} src={this.checkAvatar()} />}
                     title={(
                       <a
                         href="javascript:;"
                         onClick={() => {
-                          window.open(`/newGraph?uri=${escape(item.entity_uri)}&type=instance&subject=${subject}`)
+                          window.open(`/newGraph?name=${escape(item.entity_name)}&type=instance&subject=${subject}`)
                         }}
                       >
                         {this.handleHighlight(item.entity_name, filter)}
@@ -287,9 +243,6 @@ class ClusterBroker extends React.Component {
                       </span>
                     )}
                   />
-                  <div style={{ color: '#888', fontSize: 12, marginLeft: 80 }}>
-                    {`uri: ${item.entity_uri}`}
-                  </div>
                 </List.Item>
               )
             }}

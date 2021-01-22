@@ -3,9 +3,11 @@ import { Card, Spin, Select, Checkbox, Button } from 'antd'
 import { connect } from 'dva'
 import uuid from 'uuid'
 import _ from 'lodash'
+import Script from 'react-load-script'
 import Chart from '@/components/charts/simpleGraph'
 import { getGraphBySubandGrade } from '@/services/kgApi'
 import { getUrlParams, makeOption } from '@/utils/common'
+import { searchByKnowId } from '@/services/knowledge'
 import subjectList from '@/constants/subject'
 import gradeList from '@/constants/gradeLevel'
 import Think from './think'
@@ -38,6 +40,7 @@ class FirstGraph extends React.Component {
       subject: getUrlParams().type === 'subject' ? getUrlParams().key : 'chinese',
       gradeLevel: getUrlParams().type === 'grade' ? getUrlParams().key : '1',
       showRelation: false,
+      thinkData: [],
     }
   }
 
@@ -49,6 +52,12 @@ class FirstGraph extends React.Component {
       this.setState({ gradeLevel: key })
     }
     this.getChartData()
+  }
+
+  onhandleScript = (sign) => {
+    if (sign === 'load') {
+      this.setState({ thinkData: window.sheet })
+    }
   }
 
   getChartData = async () => {
@@ -153,6 +162,35 @@ class FirstGraph extends React.Component {
     return map
   }
 
+  getNewInstance = async (knowId) => {
+    this.setState({ loadingChart: true })
+    const data = await searchByKnowId({
+      knowId,
+    })
+    const { thinkData } = this.state
+    if (data) {
+      data.data.forEach((e, index) => {
+        let divider = ''
+        if (index < 9) {
+          divider = '00'
+        } else if (index < 99) {
+          divider = '0'
+        }
+        if (!_.find(thinkData, { 知识点名称: e.entity_name })) {
+          thinkData.push({
+            知识点名称: e.entity_name,
+            uri: e.entity_uri,
+            层级节点: '6',
+            知识点编码: knowId + divider + index,
+            学科名称: this.state.subject,
+          })
+        }
+      })
+      this.setState({ thinkData })
+    }
+    this.setState({ loadingChart: false })
+  }
+
   handleShowSingle = async (showSingle) => {
     await this.setState({ showSingle })
     this.setState({
@@ -224,7 +262,7 @@ class FirstGraph extends React.Component {
 
   render() {
     const {
-      graph, loadingChart, showRelation,
+      graph, loadingChart, showRelation, thinkData,
       subject, gradeLevel, showSingle, uri, treeData,
     } = this.state
     const { locale } = this.props
@@ -246,6 +284,12 @@ class FirstGraph extends React.Component {
 
     return (
       <div style={{ padding: '20px 10px' }}>
+        <Script
+          url="http://39.97.172.123:3000/cmcc/data.js"
+          onCreate={() => this.onhandleScript('create')}
+          onError={() => this.onhandleScript('error')}
+          onLoad={() => this.onhandleScript('load')}
+        />
         <div style={{ paddingLeft: 10 }}>
           <Select
             style={{ marginRight: 20, width: 160 }} value={subject}
@@ -269,7 +313,17 @@ class FirstGraph extends React.Component {
           >
             <Spin spinning={loadingChart}>
               <div style={{ height: 580 }}>
-                <div style={{ float: 'left', width: 300, borderRight: '1px solid #e8e8e8', height: 580, overflowY: 'scroll', padding: '0 10px' }}>
+                <div
+                  style={{
+                    float: 'left',
+                    width: 300,
+                    borderRight: '1px solid #e8e8e8',
+                    height: 580,
+                    overflowY: 'scroll',
+                    padding: '0 10px',
+                    display: showRelation === true ? 'block' : 'none',
+                  }}
+                >
                   <Tree treeData={treeData} selectTarget={this.selectTarget} uri={uri} />
                 </div>
                 <div style={{ height: 580, overflow: 'hidden' }}>
@@ -284,7 +338,9 @@ class FirstGraph extends React.Component {
                       )
                       : (
                         <Think
-                          graph={treeData} uri={uri}
+                          graph={thinkData}
+                          subject={this.state.subject}
+                          getNewInstance={this.getNewInstance}
                         />
                       )
                   }

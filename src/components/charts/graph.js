@@ -27,7 +27,9 @@ export default class GraphChart extends React.Component {
     const {
       graph, forcename, resize,
     } = nextProps
-    return !_.isEqual(graph, this.props.graph) || forcename !== this.props.forcename || !_.isEqual(resize, this.props.resize)
+    return !_.isEqual(graph, this.props.graph)
+      || forcename !== this.props.forcename
+      || !_.isEqual(resize, this.props.resize)
   }
 
   componentDidUpdate() {
@@ -69,7 +71,7 @@ export default class GraphChart extends React.Component {
 
   jumpToGraph = (param) => {
     const { data } = param
-    const { category, uri, name, type } = data
+    const { category, uri, name } = data
     if (category === '0') {
       return
     }
@@ -77,7 +79,6 @@ export default class GraphChart extends React.Component {
       this.props.handleExpandGraph({
         uri,
         name,
-        type,
       })
     }
   }
@@ -99,7 +100,6 @@ export default class GraphChart extends React.Component {
   renderChart = (dom, graph, forcename, instance, forceUpdate = false) => {
     let options
     const that = this
-    let targetIndex = 0
     if (!graph.nodes || graph.nodes.length < 1) {
       options = {
         ...options,
@@ -110,14 +110,12 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
-      console.log(forcename)
       const nodes = that.hide(_.uniqBy(graph.nodes, 'name'))
-      targetIndex = _.findIndex(nodes, { name: forcename })
       if (this.props.newClassGraph) {
         nodes.forEach((e) => {
           if (e.name === forcename) {
             e.symbolSize = 60
-            e.category = e.type === 'class' ? '0' : '2'
+            e.category = '2'
             e.label.normal.textStyle = {
               color: '#000000',
               fontWeight: '700',
@@ -125,7 +123,7 @@ export default class GraphChart extends React.Component {
             }
           } else {
             e.symbolSize = 20
-            e.category = e.type === 'class' ? '3' : '2'
+            e.category = '2'
             e.label.normal.textStyle = {
               color: '#000000',
               fontWeight: 'normal',
@@ -248,12 +246,11 @@ export default class GraphChart extends React.Component {
     myChart.on('dblclick', (params) => {
       that.openOrFold(params, graph)
     })
-    options.series[0].center = myChart._chartsViews[0]._symbolDraw._data._itemLayouts[targetIndex] // eslint-disable-line
     myChart.setOption(options)
     return myChart
   }
 
   render() {
-    return <div className="e-charts-graph" ref={t => this.dom = t} style={{ height: '100%', width: '100%' }} />
+    return <div className="e-charts-graph" ref={(t) => this.dom = t} style={{ height: '100%', width: '100%' }} />
   }
 }
