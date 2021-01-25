@@ -46,7 +46,10 @@ export default class GraphChart extends React.Component {
 
   handleLine = (str) => {
     let string = str
-    for (let i = 29; i < str.length; i += 30) {
+    if (str.length > 120) {
+      string = `${string.slice(0, 116)}...`
+    }
+    for (let i = 29; i < string.length; i += 30) {
       string = `${string.slice(0, i)}<br />${string.slice(i)}`
     }
     return string
@@ -209,11 +212,9 @@ export default class GraphChart extends React.Component {
                 if (params.data.name === this.props.forcename) {
                   res += '<br />'
                   select.forEach((e, index) => {
-                    if (index < 5) {
-                      if (e.object.length < 150) {
-                        if (e.labelList) {
-                          res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`
-                        }
+                    if (index < 4) {
+                      if (e.labelList) {
+                        res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`
                       }
                     } else if (e.predicateLabel === '内容') {
                       res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`

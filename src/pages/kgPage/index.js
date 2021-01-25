@@ -304,9 +304,9 @@ class FirstGraph extends React.Component {
             {makeOption(gradeList)}
           </Select>
         </div>
-        <div style={{ height: 650, minWidth: 1250 }}>
+        <div style={{ minHeight: 850, minWidth: 1250 }}>
           <Card
-            style={{ float: 'left', margin: 10, height: 650, width: '100%' }}
+            style={{ float: 'left', margin: 10, minHeight: 850, width: '100%' }}
             title={locale === 'cn' ? '关系图谱' : 'Relation Graph'}
             extra={extraOption}
             className={Styles.myCard}
@@ -326,7 +326,7 @@ class FirstGraph extends React.Component {
                 >
                   <Tree treeData={treeData} selectTarget={this.selectTarget} uri={uri} />
                 </div>
-                <div style={{ height: 580, overflow: 'hidden' }}>
+                <div style={{ height: 700, overflow: 'hidden' }}>
                   {
                     showRelation === true
                       ? (

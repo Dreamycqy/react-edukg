@@ -89,6 +89,27 @@ export default class GraphChart extends React.Component {
       name: subjectName,
       key: subjectName,
       children: result,
+      label: {
+        normal: {
+          rotate: 0,
+          offset: [-38, 0],
+          verticalAlign: 'middle',
+          backgroundColor: '#7049f0',
+          color: '#fff',
+          padding: 3,
+          formatter: [
+            '{box|{b}}',
+          ].join('\n'),
+          rich: {
+            box: {
+              height: 30,
+              color: '#fff',
+              padding: [0, 5],
+              align: 'center',
+            },
+          },
+        },
+      },
     }
   }
 
@@ -119,7 +140,7 @@ export default class GraphChart extends React.Component {
         series: [
           {
             type: 'tree',
-
+            roam: true,
             data: result.children.length > 0 ? [result] : [],
             layout: 'radial',
             top: '1%',
@@ -133,10 +154,8 @@ export default class GraphChart extends React.Component {
             label: {
               normal: {
                 rotate: 0,
-                position: 'right',
-                distance: -40,
+                offset: [0, -20], // [-35, 0]
                 verticalAlign: 'middle',
-                align: 'left',
                 backgroundColor: '#7049f0',
                 color: '#fff',
                 padding: 3,
@@ -156,9 +175,8 @@ export default class GraphChart extends React.Component {
             leaves: {
               label: {
                 normal: {
-                  offset: [-25, 25],
+                  offset: [0, -20],
                   verticalAlign: 'middle',
-                  // align: 'left',
                   backgroundColor: '#c44eff',
                   formatter: [
                     '{box|{b}}',

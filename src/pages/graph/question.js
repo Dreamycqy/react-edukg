@@ -52,15 +52,27 @@ class StudentPersona extends React.Component {
             return
           }
           temp2 = temp1[1].split('B．')
+          if (!temp2[1]) {
+            return
+          }
           temp3 = temp2[1].split('C．')
+          if (!temp3[1]) {
+            return
+          }
           temp4 = temp3[1].split('D．')
         } else {
+          temp1 = e.qBody.split('A.')
           if (!temp1[1]) {
             return
           }
-          temp1 = e.qBody.split('A.')
           temp2 = temp1[1].split('B.')
+          if (!temp2[1]) {
+            return
+          }
           temp3 = temp2[1].split('C.')
+          if (!temp3[1]) {
+            return
+          }
           temp4 = temp3[1].split('D.')
         }
         test.push({
