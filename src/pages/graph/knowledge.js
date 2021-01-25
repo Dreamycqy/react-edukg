@@ -19,7 +19,7 @@ import Styles from './style.less'
 const { Link } = Anchor
 const { TabPane } = Tabs
 const test = /^[A-Za-z]+$/i
-const deleteList = ['学术论文', '标注', '出处', '分类编号', '上位分类', '下位分类', '科普中国资源', '科普活动资源服务平台-科普资源', '科普活动资源服务平台-活动资源', '科学百科词条', '中国科普博览']
+const deleteList = ['学术论文', '标注', '出处', '分类编号', '上位分类', '下位分类', '科普中国资源', '科普活动资源服务平台-科普资源', '科普活动资源服务平台-活动资源', '科学百科词条', '中国科普博览', '类型']
 
 class KgContent extends React.Component {
   constructor(props) {
