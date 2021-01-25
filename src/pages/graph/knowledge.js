@@ -6,6 +6,7 @@ import { getUrlParams } from '@/utils/common'
 import { infoByInstanceName } from '@/services/knowledge'
 import { remakeGraphData } from '@/utils/graphData'
 import GrapeImg from '@/assets/grape.png'
+import edu10086 from '@/assets/edu10086.png'
 import Chart from '@/components/charts/graph'
 import Think from './think'
 import GCard from './components/graphCard'
@@ -38,6 +39,8 @@ class KgContent extends React.Component {
         links: [],
       },
       thinkData: [],
+      selectChart: 'relation',
+      liveClassRoom: '',
     }
   }
 
@@ -136,6 +139,10 @@ class KgContent extends React.Component {
     const imgList = []
     array.forEach((e) => {
       if (e.predicateLabel && deleteList.indexOf(e.predicateLabel) < 0) {
+        if (e.predicateLabel.indexOf('中移动直播课网址') > -1) {
+          this.setState({ liveClassRoom: e.object })
+          return
+        }
         if (e.object.indexOf('getjpg') > 0 || e.object.indexOf('getpng') > 0) {
           imgList.push(e)
         } else {
@@ -177,6 +184,10 @@ class KgContent extends React.Component {
     }
   }
 
+  handleSelectChart = (selectChart) => {
+    this.setState({ selectChart })
+  }
+
   handleConcat = (list) => {
     const transSource = []
     const sheetDataFilter = ['知识点', '知识内容']
@@ -212,6 +223,17 @@ class KgContent extends React.Component {
     }
     await this.setState({ selectGraph: target, forcename: target.name })
     this.getChart()
+  }
+
+  handleVideo = (url, subject) => {
+    return (
+      <div style={{ padding: 10 }}>
+        <a href={url.length === 0 ? 'http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_Index' : url} target="_blank">
+          <img src={edu10086} height="240px" width="360px" alt="" />
+          <p style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>和教育直播课</p>
+        </a>
+      </div>
+    )
   }
 
   handleRelation = (graph) => {
@@ -265,7 +287,10 @@ class KgContent extends React.Component {
 
   render() {
     const anchorList = ['graph', 'property', 'video']
-    const { forcename, loading, graph, dataSource, imgList, subject, thinkData, graphHistory } = this.state
+    const {
+      forcename, loading, graph, dataSource, imgList,
+      subject, thinkData, graphHistory, selectChart, liveClassRoom,
+    } = this.state
     if (imgList.length > 0) {
       anchorList.push('picture')
     }
@@ -296,51 +321,61 @@ class KgContent extends React.Component {
         </div>
         <div style={{ overflow: 'hidden' }}>
           <Spin spinning={loading}>
-            <GCard show title="graph">
-              <div style={{ float: 'left', width: 240, borderRight: '1px solid #e8e8e8', height: '100%' }}>
-                <Tabs>
-                  <TabPane tab="关联知识" key="2" style={{ height: 420 }}>
-                    <div style={{ height: '100%', overflowY: 'scroll' }}>
-                      {this.handleRelation(graph)}
+            <GCard show title="graph" selectChart={selectChart} onSelect={this.handleSelectChart}>
+              {selectChart === 'relation'
+                ? (
+                  <div style={{ height: 450 }}>
+                    <div style={{ float: 'left', width: 240, borderRight: '1px solid #e8e8e8', height: '100%' }}>
+                      <Tabs>
+                        <TabPane tab="关联知识" key="2" style={{ height: 420 }}>
+                          <div style={{ height: '100%', overflowY: 'scroll' }}>
+                            {this.handleRelation(graph)}
+                          </div>
+                        </TabPane>
+                        <TabPane tab="访问历史" key="1" style={{ height: 420 }}>
+                          <div style={{ height: '100%', overflowY: 'scroll' }}>
+                            {graphHistory.map((e, index) => (
+                              <div style={{ padding: 6 }}>
+                                <a
+                                  href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
+                                  onClick={() => this.handleExpandGraph(e)}
+                                >
+                                  {index === graphHistory.length - 1
+                                    ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
+                                    : <div style={{ width: 24, display: 'inline-block' }} />}
+                                  {e.name}
+                                </a>
+                              </div>
+                            ))}
+                          </div>
+                        </TabPane>
+                      </Tabs>
                     </div>
-                  </TabPane>
-                  <TabPane tab="访问历史" key="1" style={{ height: 420 }}>
-                    <div style={{ height: '100%', overflowY: 'scroll' }}>
-                      {graphHistory.map((e, index) => (
-                        <div style={{ padding: 6 }}>
-                          <a
-                            href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
-                            onClick={() => this.handleExpandGraph(e)}
-                          >
-                            {index === graphHistory.length - 1
-                              ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-                              : <div style={{ width: 24, display: 'inline-block' }} />}
-                            {e.name}
-                          </a>
-                        </div>
-                      ))}
+                    <div style={{ height: '100%', width: 'auto', overflow: 'hidden' }}>
+                      <Chart
+                        graph={graph} forcename={forcename}
+                        handleExpandGraph={this.handleExpandGraph}
+                      />
                     </div>
-                  </TabPane>
-                </Tabs>
-              </div>
-              <div style={{ height: 450, width: 'auto', overflow: 'hidden' }}>
-                <Chart
-                  graph={graph} forcename={forcename}
-                  handleExpandGraph={this.handleExpandGraph}
-                />
-              </div>
+                  </div>
+                ) : <div />}
+              {
+                selectChart === 'relation' ? <div /> : (
+                  <Think
+                    graph={thinkData}
+                    forcename={forcename}
+                    subject={subject}
+                    select={dataSource}
+                  />
+                )
+              }
             </GCard>
             <NewCard show showExtra dataConfig={dataConfig} title="property">
               <KgTable dataSource={dataSource} />
             </NewCard>
             <NewCard show title="video">
               <div style={{ height: 280 }}>
-                <div style={{ padding: 10 }}>
-                  <a href="http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_detail&courseId=5230008" target="_blank">
-                    <img src="https://edu.10086.cn/files/webupload//course/new/1599041949142.png" height="240px" width="360px" alt="" />
-                    <p style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>高一地理秋季同步班</p>
-                  </a>
-                </div>
+                {this.handleVideo(liveClassRoom, subject)}
               </div>
             </NewCard>
             <NewCard show={imgList.length > 0} title="picture">

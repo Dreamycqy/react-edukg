@@ -2,6 +2,7 @@ import React from 'react'
 import { Card, Icon, Popover, Button } from 'antd'
 import moment from 'moment'
 import ExportJsonExcel from 'js-export-excel'
+import edulogo from '@/assets/edulogo.png'
 import Styles from '../style.less'
 
 export default class LocalCard extends React.Component {
@@ -104,6 +105,10 @@ export default class LocalCard extends React.Component {
               下载
             </Button>
           </div>
+        ) : title === 'video' ? (
+          <a href="javascript:;" onClick={() => window.open('http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_Index')}>
+            <img src={edulogo} alt="" height="30px" />
+          </a>
         ) : null}
       >
         {this.renderChildren(value)}

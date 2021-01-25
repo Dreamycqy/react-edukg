@@ -172,11 +172,14 @@ export default class GraphChart extends React.Component {
         })
       }
       options = {
-        // toolbox: {
-        //   feature: {
-        //     saveAsImage: {},
-        //   },
-        // },
+        title: {
+          text: `${this.props.forcename} 的知识关系图`,
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+          },
+        },
         series: [{
           type: 'graph',
           layout: 'force',

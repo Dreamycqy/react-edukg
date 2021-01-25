@@ -182,12 +182,17 @@ export default class GraphChart extends React.Component {
         title: {
           text: `${this.props.forcename} 的相关知识导图`,
         },
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+          },
+        },
         series: [
           {
             type: 'tree',
             // layout: 'radial',
             data: result.children.length > 0 ? [result] : [],
-            initialTreeDepth: 3,
+            initialTreeDepth: 4,
             top: '1%',
             left: '7%',
             bottom: '1%',

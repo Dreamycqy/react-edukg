@@ -35,20 +35,29 @@ class StudentPersona extends React.Component {
     })
     if (data) {
       const test = []
-      let temp1 = ''
-      let temp2 = ''
-      let temp3 = ''
-      let temp4 = ''
+      let temp1 = []
+      let temp2 = []
+      let temp3 = []
+      let temp4 = []
       data.data.forEach((e) => {
-        if (e.qAnswer.length > 1) {
+        if (!e.qAnswer || !e.qBody) {
+          return
+        }
+        if (e.qAnswer.length > 1 && e.qAnswer !== '答案A' && e.qAnswer !== '答案B' && e.qAnswer !== '答案C' && e.qAnswer !== '答案D') {
           return
         }
         if (e.qBody.indexOf('．') > -1) {
           temp1 = e.qBody.split('A．')
+          if (!temp1[1]) {
+            return
+          }
           temp2 = temp1[1].split('B．')
           temp3 = temp2[1].split('C．')
           temp4 = temp3[1].split('D．')
         } else {
+          if (!temp1[1]) {
+            return
+          }
           temp1 = e.qBody.split('A.')
           temp2 = temp1[1].split('B.')
           temp3 = temp2[1].split('C.')
@@ -61,7 +70,7 @@ class StudentPersona extends React.Component {
           c: temp4[0],
           d: temp4[1],
           id: e.id,
-          correctAnswer: e.qAnswer,
+          correctAnswer: e.qAnswer.length > 1 ? e.qAnswer.split('答案')[1] : e.qAnswer,
         })
       })
       this.setState({
