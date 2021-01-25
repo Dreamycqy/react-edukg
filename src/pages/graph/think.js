@@ -193,9 +193,13 @@ export default class GraphChart extends React.Component {
             bottom: '1%',
             right: '20%',
             tooltip: {
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              borderColor: '#000000a6',
+              borderWidth: 1,
               trigger: 'item',
+              position: 'left',
               formatter: (params) => {
-                let res = '<div>'
+                let res = '<div style="color:#000000a6">'
                 res += `<div>${params.data.name}</div>`
                 if (params.data.name === this.props.forcename) {
                   res += '<br />'
@@ -203,11 +207,11 @@ export default class GraphChart extends React.Component {
                     if (index < 5) {
                       if (e.object.length < 150) {
                         if (e.labelList) {
-                          res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.join('，'))}<br /><br /></div>`
+                          res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`
                         }
                       }
                     } else if (e.predicateLabel === '内容') {
-                      res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.join('，'))}<br /><br /></div>`
+                      res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`
                     }
                   })
                 }
@@ -253,7 +257,7 @@ export default class GraphChart extends React.Component {
                   ].join('\n'),
                   rich: {
                     box: {
-                      height: 18,
+                      height: 30,
                       color: '#fff',
                       padding: [0, 5],
                       align: 'center',

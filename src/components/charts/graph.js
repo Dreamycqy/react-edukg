@@ -1,14 +1,22 @@
 import React from 'react'
+import { Table, Modal, Input } from 'antd'
 import echarts from 'echarts'
 import _ from 'lodash'
 import resizeListener, { unbind } from 'element-resize-event'
 // import color from '@/constants/colorList'
 
+const { Search } = Input
+
 export default class GraphChart extends React.Component {
-  constructor(...props) {
-    super(...props)
+  constructor(props) {
+    super(props)
     this.dom = null
     this.instance = null
+    this.state = {
+      visible: false,
+      selectColle: '',
+      searchText: '',
+    }
   }
 
   componentDidMount() {
@@ -23,10 +31,13 @@ export default class GraphChart extends React.Component {
     }
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps, nextState) {
     const {
       graph, forcename, resize,
     } = nextProps
+    if (!_.isEqual(nextState, this.nextState)) {
+      return true
+    }
     return !_.isEqual(graph, this.props.graph)
       || forcename !== this.props.forcename
       || !_.isEqual(resize, this.props.resize)
@@ -43,6 +54,10 @@ export default class GraphChart extends React.Component {
   }
 
   openOrFold = (param, graph) => {
+    if (param.data.isTable === true) {
+      this.setState({ visible: true, selectColle: param.data.oriName })
+      return
+    }
     const { name, category, open } = param.data
     if (category !== '1') {
       return
@@ -81,6 +96,15 @@ export default class GraphChart extends React.Component {
         name,
       })
     }
+    this.setState({ visible: false, searchText: '', selectColle: '' })
+  }
+
+  newJumpToGraph = (param) => {
+    this.props.handleExpandGraph({
+      uri: param.subject,
+      name: param.subject_label,
+    })
+    this.setState({ visible: false, searchText: '', selectColle: '' })
   }
 
   hide = (array) => {
@@ -95,6 +119,21 @@ export default class GraphChart extends React.Component {
       }
     })
     return result
+  }
+
+  handleTableData = (selectColle, searchText) => {
+    if (this.props.graph.tableResult && selectColle !== '') {
+      if (this.props.graph.tableResult[selectColle]) {
+        const newData = this.props.graph.tableResult[selectColle].filter((e) => {
+          return e.subject_label !== undefined
+        }).filter((e) => {
+          return e.subject_label.indexOf(searchText) > -1
+        })
+        return _.uniqBy(newData, 'subject_label')
+      }
+    } else {
+      return []
+    }
   }
 
   renderChart = (dom, graph, forcename, instance, forceUpdate = false) => {
@@ -133,6 +172,11 @@ export default class GraphChart extends React.Component {
         })
       }
       options = {
+        // toolbox: {
+        //   feature: {
+        //     saveAsImage: {},
+        //   },
+        // },
         series: [{
           type: 'graph',
           layout: 'force',
@@ -251,6 +295,47 @@ export default class GraphChart extends React.Component {
   }
 
   render() {
-    return <div className="e-charts-graph" ref={(t) => this.dom = t} style={{ height: '100%', width: '100%' }} />
+    const { visible, selectColle, searchText } = this.state
+    const columns = [{
+      title: '关联知识点',
+      dataIndex: 'subject_label',
+      render: (text, record) => {
+        return <a style={{ fontWeight: 700 }} href="javascript:;" onClick={() => this.newJumpToGraph(record)}>{text}</a>
+      },
+    }, {
+      title: '关系',
+      dataIndex: 'predicate_label',
+    }, {
+      title: '当前知识点',
+      render: () => {
+        return <span>{this.props.forcename}</span>
+      },
+    }]
+    return (
+      <div style={{ height: '100%', width: '100%' }}>
+        <Modal
+          title={`[${selectColle}] [${this.props.forcename}] 的知识点`}
+          visible={visible}
+          footer={null}
+          onOk={() => this.setState({ visible: false })}
+          onCancel={() => this.setState({ visible: false })}
+        >
+          <div style={{ height: 30, marginBottom: 10 }}>
+            <Search
+              size="small"
+              onSearch={(value) => {
+                this.setState({ searchText: value })
+              }}
+            />
+          </div>
+          <Table
+            columns={columns}
+            dataSource={this.handleTableData(selectColle, searchText)}
+            size="small"
+          />
+        </Modal>
+        <div className="e-charts-graph" ref={(t) => this.dom = t} style={{ height: '100%', width: '100%' }} />
+      </div>
+    )
   }
 }

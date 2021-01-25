@@ -127,21 +127,56 @@ export default class GraphChart extends React.Component {
             bottom: '1%',
             right: '20%',
 
-            symbolSize: 7,
+            symbol: 'rect',
+            symbolSize: 30,
 
             label: {
-              position: 'left',
-              verticalAlign: 'middle',
-              align: 'right',
-              fontSize: 9,
-            },
-
-            leaves: {
-              label: {
+              normal: {
+                rotate: 0,
                 position: 'right',
+                distance: -40,
                 verticalAlign: 'middle',
                 align: 'left',
+                backgroundColor: '#7049f0',
+                color: '#fff',
+                padding: 3,
+                formatter: [
+                  '{box|{b}}',
+                ].join('\n'),
+                rich: {
+                  box: {
+                    height: 30,
+                    color: '#fff',
+                    padding: [0, 5],
+                    align: 'center',
+                  },
+                },
               },
+            },
+            leaves: {
+              label: {
+                normal: {
+                  offset: [-25, 25],
+                  verticalAlign: 'middle',
+                  // align: 'left',
+                  backgroundColor: '#c44eff',
+                  formatter: [
+                    '{box|{b}}',
+                  ].join('\n'),
+                  rich: {
+                    box: {
+                      height: 30,
+                      color: '#fff',
+                      padding: [0, 5],
+                      align: 'center',
+                    },
+                  },
+                },
+              },
+            },
+            itemStyle: {
+              height: 18,
+              width: 30,
             },
 
             expandAndCollapse: true,
@@ -163,12 +198,12 @@ export default class GraphChart extends React.Component {
     myChart.clear()
     myChart.resize()
     myChart.setOption(options)
-    if (myChart._$handlers.click) { // eslint-disable-line
-      myChart._$handlers.click.length = 0 // eslint-disable-line
-    }
-    myChart.on('click', (params) => {
-      that.props.getNewInstance(params.data['知识点编码'])
-    })
+    // if (myChart._$handlers.click) { // eslint-disable-line
+    //   myChart._$handlers.click.length = 0 // eslint-disable-line
+    // }
+    // myChart.on('click', (params) => {
+    //   that.props.getNewInstance(params.data['知识点编码'])
+    // })
     return myChart
   }
 

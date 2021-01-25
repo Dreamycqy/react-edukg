@@ -40,6 +40,9 @@ class StudentPersona extends React.Component {
       let temp3 = ''
       let temp4 = ''
       data.data.forEach((e) => {
+        if (e.qAnswer.length > 1) {
+          return
+        }
         if (e.qBody.indexOf('．') > -1) {
           temp1 = e.qBody.split('A．')
           temp2 = temp1[1].split('B．')

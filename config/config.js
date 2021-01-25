@@ -6,7 +6,6 @@ function dir(d) {
   return path.resolve(__dirname, d)
 }
 
-
 function defineProperty() {
   const dev = {
     test: 'test',

@@ -217,7 +217,7 @@ class FirstGraph extends React.Component {
             category: '2', // 叶子节点
             symbolSize: 16, // 节点大小
             uri: e.object || e.subject,
-            show: true,
+            showLeaf: false,
             symbol: 'circle',
             edgeSymbol: ['circle', 'arrow'],
             edgeSymbolSize: [4, 10],
@@ -255,7 +255,7 @@ class FirstGraph extends React.Component {
             category: '2', // 叶子节点
             symbolSize: 16, // 节点大小
             uri: e.object || e.subject,
-            show: true,
+            showLeaf: false,
             symbol: 'circle',
             edgeSymbol: ['circle', 'arrow'],
             edgeSymbolSize: [4, 10],

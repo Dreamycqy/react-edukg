@@ -1,132 +1,71 @@
-export const graphData = (data, course) => {
-  const test = /^[A-Za-z]+$/i
+const test = /^[A-Za-z]+$/i
+export const remakeGraphData = (list, forcename) => {
+  window.location.href = '#components-anchor-graph'
   const nodes = []
   const links = []
-  const forcename = data.content.self.label
-  nodes.push({
-    category: '0',
-    name: forcename,
-    symbolSize: 60, // 节点大小
-    uri: data.content.self.uri,
-    course,
-    symbol: data.content.self.type === 'rdftype' ? 'rect' : 'circle',
-    draggable: true,
-    label: {
-      normal: {
-        show: true,
-        position: 'bottom',
-        formatter: (val) => {
-          const strs = val.data.name.replace(' ', '\n').split('')
-          let str = ''
-          for (let j = 0, s; s = strs[j++];) {
-            str += s
-            if (!(j % 8) && !test.test(s)) str += '\n'
-          }
-          return str
-        },
-        textStyle: {
-          color: '#000000',
-          fontWeight: 'normal',
-          fontSize: '12',
-        },
-      },
-    },
-  })
-  const predicateList = {}
-  data.content.list.forEach((item) => { // 归类
-    if (item.predicate !== null) {
-      if (!predicateList[item.predicate]) {
-        predicateList[item.predicate] = []
-      }
-      predicateList[item.predicate].push(item)
-    } else {
-      if (!predicateList['nullNodes']) {
-        predicateList['nullNodes'] = []
-      }
-      predicateList['nullNodes'].push(item)
+  const tableResult = {}
+  const temp = {}
+  list.forEach((e) => {
+    if (!e.predicate_label) {
+      e.predicate_label = '实体'
+    }
+    if (!temp[e.predicate_label] && e.predicate_label.indexOf('科普') < 0) {
+      temp[e.predicate_label] = []
+    }
+    if (e.predicate_label.indexOf('科普') < 0) {
+      temp[e.predicate_label].push(e)
     }
   })
-  for (const i in predicateList) { // eslint-disable-line
-    if (i !== 'nullNodes') {
-      if (predicateList[i].length > 2) { // 子节点数量大于2则成集
-        nodes.push({
-          name: `${i} 集`,
-          category: '1', // 二级父节点
-          symbolSize: 36, // 节点大小
-          uri: '',
-          course,
-          open: false,
-          symbol: 'circle',
-          draggable: true,
-          label: {
-            normal: {
-              show: true,
-              position: 'bottom',
-              formatter: (val) => {
-                const strs = val.data.name.replace(' ', '\n').split('')
-                let str = ''
-                for (let j = 0, s; s = strs[j++];) {
-                  str += s
-                  if (!(j % 8) && !test.test(s)) str += '\n'
-                }
-                return str
-              },
-              textStyle: {
-                color: '#000000',
-                fontWeight: 'normal',
-                fontSize: '12',
-              },
+  for (const colle in temp) { // eslint-disable-line
+    if (temp[colle].length > 2) {
+      nodes.push({
+        name: `${colle} (集)`,
+        oriName: colle,
+        category: '1', // 二级父节点
+        symbolSize: 36, // 节点大小
+        uri: '',
+        open: false,
+        symbol: temp[colle].length > 50 ? 'rect' : 'circle',
+        edgeSymbol: ['circle', 'arrow'],
+        edgeSymbolSize: [4, 10],
+        draggable: true,
+        isTable: temp[colle].length > 50,
+        label: {
+          normal: {
+            show: true,
+            position: 'bottom',
+            formatter: (val) => { // eslint-disable-line
+              const strs = val.data.name.replace(' ', '\n').split('')
+              let str = ''
+              for (let j = 0, s; s = strs[j++];) {
+                str += s
+                if (!(j % 8) && !test.test(s)) str += '\n'
+              }
+              return str
+            },
+            textStyle: {
+              color: '#000000',
+              fontWeight: 'normal',
+              fontSize: '12',
             },
           },
-        })
-        links.push({
-          source: forcename,
-          target: `${i} 集`,
-        })
-        predicateList[i].forEach((e) => {
+        },
+      })
+      links.push({
+        source: `${colle} (集)`,
+        target: forcename,
+      })
+      if (temp[colle].length <= 50) {
+        temp[colle].forEach((e) => { // eslint-disable-line
           nodes.push({
-            name: `${e.label} (${i})`,
+            name: e.object_label || e.subject_label,
             category: '2', // 叶子节点
-            symbolSize: 10, // 节点大小
-            uri: e.uri,
-            course,
+            symbolSize: 16, // 节点大小
+            uri: e.object || e.subject,
             showLeaf: false,
             symbol: 'circle',
-            label: {
-              normal: {
-                show: true,
-                position: 'bottom',
-                formatter: (val) => {
-                  const strs = val.data.name.replace(' ', '\n').split('')
-                  let str = ''
-                  for (let j = 0, s; s = strs[j++];) {
-                    str += s
-                    if (!(j % 8) && !test.test(s)) str += '\n'
-                  }
-                  return str
-                },
-                textStyle: {
-                  color: '#000000',
-                  fontWeight: 'normal',
-                  fontSize: '12',
-                },
-              },
-            },
-          })
-          links.push({
-            source: `${i} 集`,
-            target: `${e.label} (${i})`,
-          })
-        })
-      } else {
-        predicateList[i].forEach((e) => {
-          nodes.push({
-            name: e.label,
-            category: '3', // 二级非父节点
-            symbolSize: 36, // 节点大小
-            uri: e.uri,
-            course,
-            symbol: e.type === 'rdftype' ? 'rect' : 'circle',
+            edgeSymbol: ['circle', 'arrow'],
+            edgeSymbolSize: [4, 10],
             draggable: true,
             label: {
               normal: {
@@ -150,20 +89,24 @@ export const graphData = (data, course) => {
             },
           })
           links.push({
-            source: forcename,
-            target: e.label,
+            source: e.object_label || e.subject_label,
+            target: `${colle} (集)`,
           })
         })
+      } else {
+        tableResult[colle] = temp[colle]
       }
     } else {
-      predicateList[i].forEach((e) => {
+      temp[colle].forEach((e) => { // eslint-disable-line
         nodes.push({
-          name: e.label,
-          category: '3', // 二级非父节点且predicate为null
-          symbolSize: 36, // 节点大小
-          uri: e.uri,
-          course,
-          symbol: e.type === 'rdftype' ? 'rect' : 'circle',
+          name: e.object_label || e.subject_label,
+          category: '2', // 叶子节点
+          symbolSize: 16, // 节点大小
+          uri: e.object || e.subject,
+          showLeaf: false,
+          symbol: 'circle',
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
           draggable: true,
           label: {
             normal: {
@@ -187,11 +130,11 @@ export const graphData = (data, course) => {
           },
         })
         links.push({
-          source: forcename,
-          target: e.label,
+          source: e.object_label || e.subject_label,
+          target: forcename,
         })
       })
     }
   }
-  return { nodes, links, forcename }
+  return { nodes, links, tableResult }
 }

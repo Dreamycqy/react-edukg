@@ -18,7 +18,7 @@ class Gallery extends React.Component {
   }
 
   chooseImg = (num) => {
-    const { imgList } = this.state
+    const { imgList } = this.props
     this.setState({
       modalVisible: true,
       selectImg: {
@@ -30,7 +30,7 @@ class Gallery extends React.Component {
 
   renderImg = (list) => {
     const result = []
-    const { imgList } = this.state
+    const { imgList } = this.props
     list.forEach((e) => {
       result.push(
         <div>
