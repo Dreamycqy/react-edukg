@@ -2,6 +2,9 @@ export default {
   namespace: 'global',
   state: {
     locale: 'cn',
+    userName: '',
+    userConfig: {},
+    email: '',
   },
   reducers: {
     save(state, { payload: { userInfo = {} } }) {

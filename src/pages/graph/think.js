@@ -136,6 +136,29 @@ export default class GraphChart extends React.Component {
     }
   }
 
+  checkHighScore = (data, targetList) => {
+    const wordList = targetList[0].objectLabel.split('')
+    let highScore = 0
+    let target = ''
+    data.forEach((e) => {
+      let objScore = 0
+      if (e['知识点名称'].indexOf(this.props.forcename) > -1) {
+        highScore = 999
+        target = e['知识点编码']
+      }
+      for (const i of wordList) {
+        if (e['知识点名称'].indexOf(i) > -1) {
+          objScore += 1
+        }
+      }
+      if (objScore > highScore) {
+        highScore = objScore
+        target = e['知识点编码']
+      }
+    })
+    return target
+  }
+
   renderChart = (dom, graph, select, instance, forceUpdate = false) => {
     let options
     const { subject } = this.props
@@ -157,13 +180,7 @@ export default class GraphChart extends React.Component {
       }
     })
     if (target === '') {
-      data.forEach((e) => {
-        for (const i of targetList) {
-          if (e['知识点名称'].indexOf(this.props.forcename) > -1 || e['知识点名称'].indexOf(i.objectLabel) > -1) {
-            target = e['知识点编码']
-          }
-        }
-      })
+      target = this.checkHighScore(data, targetList)
     }
     if (!graph) {
       options = {

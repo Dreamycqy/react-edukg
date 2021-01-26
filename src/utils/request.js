@@ -13,6 +13,10 @@ export default {
     const rSymbol = opts.rSymbol || params.rSymbol
     delete params.successTip
     delete params.rSymbol
+    if (opts.url.indexOf('login') < 0 && opts.url.indexOf('typeAuth') > -1) {
+      const { id } = window.localStorage
+      params.id = id
+    }
     const optsUrl = opts.url
     const { token, cancel } = CancelToken.source()
     if (rSymbol) {
@@ -52,6 +56,8 @@ export default {
     if (rSymbol) {
       window.GLOBAL.requestSymbols[rSymbol] = cancel
     }
+    const { id } = window.localStorage
+    params.id = id
     return axios.get(opts.url, {
       params: opts.data || opts.params || {},
     }, {
