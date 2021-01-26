@@ -77,7 +77,24 @@ export default class GraphChart extends React.Component {
       if (e['知识点编码'] === target) {
         map[e['层级节点']][e['知识点编码']].children.push({
           name: this.props.forcename,
+          key: this.props.forcename,
           children: [],
+          label: {
+            normal: {
+              backgroundColor: 'red',
+              formatter: [
+                '{box|{b}}',
+              ].join('\n'),
+              rich: {
+                box: {
+                  height: 40,
+                  color: 'red',
+                  padding: [0, 15],
+                  align: 'center',
+                },
+              },
+            },
+          },
         })
         targetObj = {
           ...e,

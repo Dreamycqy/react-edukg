@@ -11,8 +11,8 @@ GLOBAL.requestCancel = (rSymbol, msg = '') => {
 export const dva = {
   config: {
     onError(err) {
-      err.preventDefault();
-      console.error(err.message);
+      err.preventDefault()
+      console.error(err.message)
     },
   },
-};
+}

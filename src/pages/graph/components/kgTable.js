@@ -36,9 +36,9 @@ const columns = [{
   align: 'left',
   render: (text, record) => {
     if (record.labelList) {
-      return <span style={{ color: '#24afe6' }}>{record.labelList.filter((e) => { return e.indexOf('http') < 0 }).join('， ')}</span>
+      return <span style={{ color: '#000000a6' }}>{record.labelList.filter((e) => { return e.indexOf('http') < 0 }).join('， ')}</span>
     } else {
-      return <span style={{ color: '#24afe6' }}>{record.object}</span>
+      return <span style={{ color: '#000000a6' }}>{record.object}</span>
     }
   },
 }]

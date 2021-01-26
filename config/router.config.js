@@ -27,6 +27,10 @@ export default [
         path: 'kgPage',
         component: './kgPage/index',
       },
+      {
+        path: 'collection',
+        component: './collection/index',
+      },
     ],
   },
 ]

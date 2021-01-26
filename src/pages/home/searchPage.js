@@ -186,7 +186,7 @@ class ClusterBroker extends React.Component {
             例：
             <a href="javascript:;" onClick={() => this.search('亚洲', 'geo')}>亚洲</a>
             <Divider type="vertical" />
-            <a href="javascript:;" onClick={() => this.search('法拉第电磁感应定律', 'physics')}>法拉第电磁感应定律</a>
+            <a href="javascript:;" onClick={() => this.search('入射光线', 'physics')}>入射光线</a>
             <Divider type="vertical" />
             <a href="javascript:;" onClick={() => this.search('动能、势能的大小变化及判断', 'physics')}>动能、势能的大小变化及判断</a>
           </div>
