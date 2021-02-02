@@ -14,11 +14,11 @@ export default class GraphChart extends React.Component {
   }
 
   componentDidMount() {
-    const { graph, select } = this.props
+    const { graph, select, dataSource } = this.props
     try {
-      this.instance = this.renderChart(this.dom, graph, select, this.instance)
+      this.instance = this.renderChart(this.dom, graph, select, dataSource, this.instance)
       resizeListener(this.dom, () => {
-        this.instance = this.renderChart(this.dom, graph, select, this.instance, true)
+        this.instance = this.renderChart(this.dom, graph, select, dataSource, this.instance, true)
       })
     } catch (e) {
       console.log(e); // eslint-disable-line
@@ -27,16 +27,17 @@ export default class GraphChart extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const {
-      graph, select, resize,
+      graph, select, dataSource, resize,
     } = nextProps
     return !_.isEqual(graph, this.props.graph)
       || !_.isEqual(resize, this.props.resize)
+      || !_.isEqual(dataSource, this.props.dataSource)
       || !_.isEqual(select, this.props.select)
   }
 
   componentDidUpdate() {
-    const { graph, select } = this.props
-    this.instance = this.renderChart(this.dom, graph, select, this.instance)
+    const { graph, select, dataSource } = this.props
+    this.instance = this.renderChart(this.dom, graph, select, dataSource, this.instance)
   }
 
   componentWillUnmount() {
@@ -46,10 +47,10 @@ export default class GraphChart extends React.Component {
 
   handleLine = (str) => {
     let string = str
-    if (str.length > 120) {
-      string = `${string.slice(0, 116)}...`
+    if (str.length > 150) {
+      string = `${string.slice(0, 146)}...`
     }
-    for (let i = 29; i < string.length; i += 30) {
+    for (let i = 49; i < string.length; i += 50) {
       string = `${string.slice(0, i)}<br />${string.slice(i)}`
     }
     return string
@@ -176,7 +177,7 @@ export default class GraphChart extends React.Component {
     return target
   }
 
-  renderChart = (dom, graph, select, instance, forceUpdate = false) => {
+  renderChart = (dom, graph, select, dataSource, instance, forceUpdate = false) => {
     let options
     const { subject } = this.props
     const subjectName = _.find(subList, { value: subject }).name
@@ -239,13 +240,13 @@ export default class GraphChart extends React.Component {
               borderColor: '#000000a6',
               borderWidth: 1,
               trigger: 'item',
-              position: 'left',
+              // position: 'left',
               formatter: (params) => {
                 let res = '<div style="color:#000000a6">'
                 res += `<div>${params.data.name}</div>`
                 if (params.data.name === this.props.forcename) {
                   res += '<br />'
-                  select.forEach((e, index) => {
+                  dataSource.forEach((e, index) => {
                     if (index < 4) {
                       if (e.labelList) {
                         res += `<div>${e.predicateLabel}：${that.handleLine(e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join('，'))}<br /><br /></div>`

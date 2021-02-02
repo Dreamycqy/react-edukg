@@ -101,7 +101,7 @@ class KgContent extends React.Component {
               ...e,
               labelList: [text],
             })
-          } else {
+          } else if (target.labelList.indexOf(text) < 0) {
             target.labelList.push(text)
           }
         }
@@ -302,6 +302,7 @@ class KgContent extends React.Component {
                     forcename={forcename}
                     subject={subject}
                     select={graph.nodes}
+                    dataSource={dataSource}
                   />
                 )
               }
