@@ -154,7 +154,7 @@ export default class GraphChart extends React.Component {
   }
 
   checkHighScore = (data, targetList) => {
-    const wordList = targetList[0].objectLabel.split('')
+    const wordList = targetList[0].colle.split('')
     let highScore = 0
     let target = ''
     data.forEach((e) => {
@@ -185,10 +185,10 @@ export default class GraphChart extends React.Component {
     })
     let target = ''
     const targetList = []
-    const selectOne = select.filter((e) => { return e.predicateLabel === '分类' })
+    const selectOne = select.filter((e) => { return e.colle === '分类' })
     selectOne.forEach((e) => {
-      if (e.object.indexOf('cmcc/') > -1) {
-        const code = e.object.split('category#')[1]
+      if (e.uri.indexOf('cmcc/') > -1) {
+        const code = e.uri.split('category#')[1]
         if (target.length > code.length || target === '') {
           target = code
         }
@@ -196,7 +196,7 @@ export default class GraphChart extends React.Component {
         targetList.push(e)
       }
     })
-    if (target === '') {
+    if (target === '' && targetList.length > 0) {
       target = this.checkHighScore(data, targetList)
     }
     if (!graph) {

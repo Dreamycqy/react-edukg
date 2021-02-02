@@ -3,22 +3,22 @@ import { Anchor, Spin, Icon, Tabs } from 'antd'
 import _ from 'lodash'
 import Script from 'react-load-script'
 import { getUrlParams } from '@/utils/common'
-import { infoByInstanceName, infoByCmccUrl } from '@/services/knowledge'
+import { infoByInstanceName } from '@/services/knowledge'
 import { remakeGraphData } from '@/utils/graphData'
 import GrapeImg from '@/assets/grape.png'
 import edu10086 from '@/assets/edu10086.png'
-import Chart from '@/components/charts/newGraph'
+import Chart from '@/components/charts/graph'
 import Think from './think'
 import GCard from './components/graphCard'
 import NewCard from './components/localCard'
 import KgTable from './components/kgTable'
 import Gallery from './components/gallery'
-import NewTree from './components/tree'
 import Questions from './question'
 import Styles from './style.less'
 
 const { Link } = Anchor
 const { TabPane } = Tabs
+const test = /^[A-Za-z]+$/i
 const deleteList = ['学术论文', '标注', '出处', '分类编号', '上位分类', '下位分类', '科普中国资源', '科普活动资源服务平台-科普资源', '科普活动资源服务平台-活动资源', '科学百科词条', '中国科普博览', '类型']
 
 class KgContent extends React.Component {
@@ -30,6 +30,10 @@ class KgContent extends React.Component {
       subject: getUrlParams().subject || 'chinese',
       dataSource: [],
       imgList: [],
+      graphHistory: [],
+      selectGraph: {
+        name: unescape(getUrlParams().name || ''),
+      },
       graph: {
         nodes: [],
         links: [],
@@ -37,7 +41,6 @@ class KgContent extends React.Component {
       thinkData: [],
       selectChart: 'relation',
       liveClassRoom: '',
-      classRoomInfo: {},
     }
   }
 
@@ -53,7 +56,7 @@ class KgContent extends React.Component {
 
   getChart = async () => {
     this.setState({ loading: true })
-    const { forcename, subject } = this.state
+    const { forcename, subject, graphHistory } = this.state
     if (forcename.length === 0) {
       this.setState({
         loading: false,
@@ -72,7 +75,57 @@ class KgContent extends React.Component {
     })
     if (data) {
       const { label, property, content } = data.data
+      if (graphHistory.length === 0) {
+        graphHistory.push({
+          name: label,
+          uri: '',
+        })
+      }
       const params = remakeGraphData(content, label, 'instance')
+      graphHistory.forEach((e, index) => {
+        if (index < graphHistory.length - 1) {
+          params.nodes = params.nodes.filter((j) => { return j.name !== e.name })
+        } else {
+          params.nodes = params.nodes.filter((j) => { return !(j.name === e.name && j.category === '2') })
+        }
+        params.links = params.links.filter((j) => { return j.source !== e.name })
+        params.nodes.push({
+          name: e.name,
+          category: index === graphHistory.length - 1 ? '0' : '3', // 历史节点
+          symbolSize: index === graphHistory.length - 1 ? 60 : 40, // 节点大小
+          uri: e.uri,
+          symbol: 'circle',
+          edgeSymbol: ['circle', 'arrow'],
+          edgeSymbolSize: [4, 10],
+          draggable: true,
+          label: {
+            normal: {
+              show: true,
+              position: 'bottom',
+              formatter: (val) => {
+                const strs = val.data.name.replace(' ', '\n').split('')
+                let str = ''
+                for (let j = 0, s; s = strs[j++];) {
+                  str += s
+                  if (!(j % 8) && !test.test(s)) str += '\n'
+                }
+                return str
+              },
+              textStyle: {
+                color: '#000000',
+                fontWeight: 'normal',
+                fontSize: '12',
+              },
+            },
+          },
+        })
+        if (graphHistory[index - 1]) {
+          params.links.push({
+            source: e.name,
+            target: graphHistory[index - 1].name,
+          })
+        }
+      })
       this.setState({
         dataSource: property ? this.handleData(property) : [],
         graph: params,
@@ -88,7 +141,6 @@ class KgContent extends React.Component {
       if (e.predicateLabel && deleteList.indexOf(e.predicateLabel) < 0) {
         if (e.predicateLabel.indexOf('中移动直播课网址') > -1) {
           this.setState({ liveClassRoom: e.object })
-          this.handleVideoInfo(e.object)
           return
         }
         if (e.object.indexOf('getjpg') > 0 || e.object.indexOf('getpng') > 0) {
@@ -157,32 +209,28 @@ class KgContent extends React.Component {
   }
 
   handleExpandGraph = async (target) => {
-    await this.setState({ forcename: target.name })
+    const { graphHistory, selectGraph } = this.state
+    const num = _.findIndex(graphHistory, { name: target.name })
+    if (num > -1) {
+      this.setState({ graphHistory: graphHistory.splice(0, num + 1) })
+    } else {
+      this.setState({
+        graphHistory: [...graphHistory, {
+          ...target,
+          target: selectGraph.name,
+        }],
+      })
+    }
+    await this.setState({ selectGraph: target, forcename: target.name })
     this.getChart()
   }
 
-  handleVideoInfo = async (url) => {
-    const data = await infoByCmccUrl({
-      url,
-    })
-    if (data) {
-      this.setState({
-        classRoomInfo: data.data,
-      })
-    }
-  }
-
-  handleVideo = (url, classRoomInfo) => {
+  handleVideo = (url, subject) => {
     return (
       <div style={{ padding: 10 }}>
         <a href={url.length === 0 ? 'http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_Index' : url} target="_blank">
-          <img src={classRoomInfo.coverImageUrl ? classRoomInfo.coverImageUrl : edu10086} height="240px" width="360px" alt="" />
-          <div style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>
-            {classRoomInfo.name ? classRoomInfo.name : '和教育直播课'}
-          </div>
-          <div style={{ width: 360, textAlign: 'center', fontSize: 14 }}>
-            {classRoomInfo.teacherName ? `主讲：${classRoomInfo.teacherName}` : null}
-          </div>
+          <img src={edu10086} height="240px" width="360px" alt="" />
+          <p style={{ width: 360, textAlign: 'center', fontSize: 16, marginTop: 6 }}>和教育直播课</p>
         </a>
       </div>
     )
@@ -191,7 +239,7 @@ class KgContent extends React.Component {
   handleRelation = (graph) => {
     const result = []
     _.uniqBy(graph.nodes, 'name').filter((e) => { return e.name.indexOf('实体') < 0 }).forEach((e, index) => {
-      if (index > 20) {
+      if (e.category !== '2' || index > 20) {
         return
       }
       result.push(
@@ -206,27 +254,26 @@ class KgContent extends React.Component {
         </div>,
       )
     })
-    console.log(graph.treeData)
-    // for (const i in graph.tableResult) { // eslint-disable-line
-    //   _.uniqBy(graph.tableResult[i], 'subject_label').forEach((e) => {
-    //     if (result.length <= 20) {
-    //       result.push(
-    //         <div style={{ padding: 6 }}>
-    //           <a
-    //             href="javascript:;" style={{ margin: 10, color: '#24b0e6' }}
-    //             onClick={() => this.handleExpandGraph({
-    //               name: e.subject_label,
-    //               uri: e.subject,
-    //             })}
-    //           >
-    //             <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-    //             {e.subject_label}
-    //           </a>
-    //         </div>,
-    //       )
-    //     }
-    //   })
-    // }
+    for (const i in graph.tableResult) { // eslint-disable-line
+      _.uniqBy(graph.tableResult[i], 'subject_label').forEach((e) => {
+        if (result.length <= 20) {
+          result.push(
+            <div style={{ padding: 6 }}>
+              <a
+                href="javascript:;" style={{ margin: 10, color: '#24b0e6' }}
+                onClick={() => this.handleExpandGraph({
+                  name: e.subject_label,
+                  uri: e.subject,
+                })}
+              >
+                <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
+                {e.subject_label}
+              </a>
+            </div>,
+          )
+        }
+      })
+    }
     return result
   }
 
@@ -242,7 +289,7 @@ class KgContent extends React.Component {
     const anchorList = ['graph', 'property', 'video']
     const {
       forcename, loading, graph, dataSource, imgList,
-      subject, thinkData, selectChart, liveClassRoom, classRoomInfo,
+      subject, thinkData, graphHistory, selectChart, liveClassRoom,
     } = this.state
     if (imgList.length > 0) {
       anchorList.push('picture')
@@ -278,11 +325,28 @@ class KgContent extends React.Component {
               {selectChart === 'relation'
                 ? (
                   <div style={{ height: 450 }}>
-                    <div style={{ float: 'left', width: 210, borderRight: '1px solid #e8e8e8', height: '100%' }}>
+                    <div style={{ float: 'left', width: 240, borderRight: '1px solid #e8e8e8', height: '100%' }}>
                       <Tabs>
-                        <TabPane tab="关联知识" key="1" style={{ height: 420 }}>
-                          <div style={{ height: '100%', overflow: 'scroll' }}>
-                            <NewTree gData={graph.treeData} handleExpandGraph={this.handleExpandGraph} />
+                        <TabPane tab="关联知识" key="2" style={{ height: 420 }}>
+                          <div style={{ height: '100%', overflowY: 'scroll' }}>
+                            {this.handleRelation(graph)}
+                          </div>
+                        </TabPane>
+                        <TabPane tab="访问历史" key="1" style={{ height: 420 }}>
+                          <div style={{ height: '100%', overflowY: 'scroll' }}>
+                            {graphHistory.map((e, index) => (
+                              <div style={{ padding: 6 }}>
+                                <a
+                                  href="javascript:;" style={{ margin: 10, color: index === graphHistory.length - 1 ? '#24b0e6' : '#888' }}
+                                  onClick={() => this.handleExpandGraph(e)}
+                                >
+                                  {index === graphHistory.length - 1
+                                    ? <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
+                                    : <div style={{ width: 24, display: 'inline-block' }} />}
+                                  {e.name}
+                                </a>
+                              </div>
+                            ))}
                           </div>
                         </TabPane>
                       </Tabs>
@@ -301,7 +365,7 @@ class KgContent extends React.Component {
                     graph={thinkData}
                     forcename={forcename}
                     subject={subject}
-                    select={graph.nodes}
+                    select={dataSource}
                   />
                 )
               }
@@ -310,8 +374,8 @@ class KgContent extends React.Component {
               <KgTable dataSource={dataSource} />
             </NewCard>
             <NewCard show title="video">
-              <div style={{ height: 300 }}>
-                {this.handleVideo(liveClassRoom, classRoomInfo)}
+              <div style={{ height: 280 }}>
+                {this.handleVideo(liveClassRoom, subject)}
               </div>
             </NewCard>
             <NewCard show={imgList.length > 0} title="picture">

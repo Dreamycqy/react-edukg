@@ -1,11 +1,11 @@
 import React from 'react'
-import { Table, Modal, Input } from 'antd'
+// import { Table, Modal, Input } from 'antd'
 import echarts from 'echarts'
 import _ from 'lodash'
 import resizeListener, { unbind } from 'element-resize-event'
 // import color from '@/constants/colorList'
 
-const { Search } = Input
+// const { Search } = Input
 
 export default class GraphChart extends React.Component {
   constructor(props) {
@@ -13,9 +13,9 @@ export default class GraphChart extends React.Component {
     this.dom = null
     this.instance = null
     this.state = {
-      visible: false,
-      selectColle: '',
-      searchText: '',
+      // visible: false,
+      // selectColle: '',
+      // searchText: '',
     }
   }
 
@@ -53,36 +53,36 @@ export default class GraphChart extends React.Component {
     this.instance && this.instance.dispose()  //  eslint-disable-line
   }
 
-  openOrFold = (param, graph) => {
-    if (param.data.isTable === true) {
-      this.setState({ visible: true, selectColle: param.data.oriName })
-      return
-    }
-    const { name, category, open } = param.data
-    if (category !== '1') {
-      return
-    }
-    const { nodes, links } = graph
-    const newNodes = nodes
-    if (open === true) {
-      if (_.find(newNodes, { name }) !== undefined) {
-        _.find(newNodes, { name }).open = false
-        links.forEach((e) => {
-          if (e.target === name) {
-            _.find(newNodes, { name: e.source }).show = false
-          }
-        })
-      }
-    } else if (_.find(newNodes, { name }) !== undefined) {
-      _.find(newNodes, { name }).open = true
-      links.forEach((e) => {
-        if (e.target === name) {
-          _.find(newNodes, { name: e.source }).show = true
-        }
-      })
-    }
-    this.renderChart(this.dom, { nodes: newNodes, links }, this.props.forcename, this.instance)
-  }
+  // openOrFold = (param, graph) => {
+  //   if (param.data.isTable === true) {
+  //     this.setState({ visible: true, selectColle: param.data.oriName })
+  //     return
+  //   }
+  //   const { name, category, open } = param.data
+  //   if (category !== '1') {
+  //     return
+  //   }
+  //   const { nodes, links } = graph
+  //   const newNodes = nodes
+  //   if (open === true) {
+  //     if (_.find(newNodes, { name }) !== undefined) {
+  //       _.find(newNodes, { name }).open = false
+  //       links.forEach((e) => {
+  //         if (e.target === name) {
+  //           _.find(newNodes, { name: e.source }).show = false
+  //         }
+  //       })
+  //     }
+  //   } else if (_.find(newNodes, { name }) !== undefined) {
+  //     _.find(newNodes, { name }).open = true
+  //     links.forEach((e) => {
+  //       if (e.target === name) {
+  //         _.find(newNodes, { name: e.source }).show = true
+  //       }
+  //     })
+  //   }
+  //   this.renderChart(this.dom, { nodes: newNodes, links }, this.props.forcename, this.instance)
+  // }
 
   jumpToGraph = (param) => {
     const { data } = param
@@ -96,16 +96,16 @@ export default class GraphChart extends React.Component {
         name,
       })
     }
-    this.setState({ visible: false, searchText: '', selectColle: '' })
+    // this.setState({ visible: false, searchText: '', selectColle: '' })
   }
 
-  newJumpToGraph = (param) => {
-    this.props.handleExpandGraph({
-      uri: param.subject,
-      name: param.subject_label,
-    })
-    this.setState({ visible: false, searchText: '', selectColle: '' })
-  }
+  // newJumpToGraph = (param) => {
+  //   this.props.handleExpandGraph({
+  //     uri: param.subject,
+  //     name: param.subject_label,
+  //   })
+  // this.setState({ visible: false, searchText: '', selectColle: '' })
+  // }
 
   hide = (array) => {
     const result = []
@@ -149,7 +149,15 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
-      const nodes = that.hide(_.uniqBy(graph.nodes, 'name'))
+      const nodes = _.uniqBy(graph.nodes, 'name')
+      const categories = []
+      nodes.forEach((e) => {
+        if (e.colle && !_.find(categories, { name: e.colle })) {
+          categories.push({
+            name: e.colle,
+          })
+        }
+      })
       if (this.props.newClassGraph) {
         nodes.forEach((e) => {
           if (e.name === forcename) {
@@ -188,19 +196,19 @@ export default class GraphChart extends React.Component {
           edgeSymbolSize: [4, 10],
           name: forcename,
           roam: true,
-          force: {
-            initLayout: 'circular',
-            repulsion: 50,
-            gravity: 0.01,
-            // edgeLength: 100,
-            layoutAnimation: true,
-          },
           gravity: 1,
           tooltip: {
             trigger: 'item',
             textStyle: {
               fontSize: 12,
             },
+          },
+          force: {
+            initLayout: 'circular',
+            repulsion: 50,
+            gravity: 0.01,
+            edgeLength: 200,
+            layoutAnimation: true,
           },
           linkSymbol: 'arrow',
           categories: [
@@ -218,49 +226,16 @@ export default class GraphChart extends React.Component {
                 },
               },
             },
-            {
-              name: '1',
-              itemStyle: {
-                normal: {
-                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                    offset: 0,
-                    color: '#157eff',
-                  }, {
-                    offset: 1,
-                    color: '#35c2ff',
-                  }]),
-                },
-              },
-            },
-            {
-              name: '2',
-              itemStyle: {
-                normal: {
-                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                    offset: 0,
-                    color: '#ffb402',
-                  }, {
-                    offset: 1,
-                    color: '#ffdc84',
-                  }]),
-                },
-              },
-            },
-            {
-              name: '3',
-              itemStyle: {
-                normal: {
-                  color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [{
-                    offset: 0,
-                    color: '#01acca',
-                  }, {
-                    offset: 1,
-                    color: '#5adbe7',
-                  }]),
-                },
-              },
-            },
+            ...categories,
           ],
+          lineStyle: {
+            color: 'source',
+          },
+          emphasis: {
+            lineStyle: {
+              width: 5,
+            },
+          },
           minRadius: 1,
           maxRadius: 5,
           coolDown: 0.995,
@@ -278,45 +253,45 @@ export default class GraphChart extends React.Component {
       return myChart
     }
     if (instance) myChart = instance
-    else myChart = echarts.init(dom)
+    else myChart = echarts.init(dom, 'light')
     myChart.clear()
     myChart.resize()
     myChart.setOption(options)
     if (myChart._$handlers.click) { // eslint-disable-line
       myChart._$handlers.click.length = 0 // eslint-disable-line
-    } if (myChart._$handlers.dblclick) { // eslint-disable-line
-      myChart._$handlers.dblclick.length = 0 // eslint-disable-line
+    // } if (myChart._$handlers.dblclick) { // eslint-disable-line
+    //   myChart._$handlers.dblclick.length = 0 // eslint-disable-line
     }
     myChart.on('click', (params) => {
       that.jumpToGraph(params)
     })
-    myChart.on('dblclick', (params) => {
-      that.openOrFold(params, graph)
-    })
+    // myChart.on('dblclick', (params) => {
+    //   that.openOrFold(params, graph)
+    // })
     myChart.setOption(options)
     return myChart
   }
 
   render() {
-    const { visible, selectColle, searchText } = this.state
-    const columns = [{
-      title: '关联知识点',
-      dataIndex: 'subject_label',
-      render: (text, record) => {
-        return <a style={{ fontWeight: 700 }} href="javascript:;" onClick={() => this.newJumpToGraph(record)}>{text}</a>
-      },
-    }, {
-      title: '关系',
-      dataIndex: 'predicate_label',
-    }, {
-      title: '当前知识点',
-      render: () => {
-        return <span>{this.props.forcename}</span>
-      },
-    }]
+    // const { visible, selectColle, searchText } = this.state
+    // const columns = [{
+    //   title: '关联知识点',
+    //   dataIndex: 'subject_label',
+    //   render: (text, record) => {
+    //     return <a style={{ fontWeight: 700 }} href="javascript:;" onClick={() => this.newJumpToGraph(record)}>{text}</a>
+    //   },
+    // }, {
+    //   title: '关系',
+    //   dataIndex: 'predicate_label',
+    // }, {
+    //   title: '当前知识点',
+    //   render: () => {
+    //     return <span>{this.props.forcename}</span>
+    //   },
+    // }]
     return (
       <div style={{ height: '100%', width: '100%' }}>
-        <Modal
+        {/* <Modal
           title={`[${selectColle}] [${this.props.forcename}] 的知识点`}
           visible={visible}
           footer={null}
@@ -336,7 +311,7 @@ export default class GraphChart extends React.Component {
             dataSource={this.handleTableData(selectColle, searchText)}
             size="small"
           />
-        </Modal>
+        </Modal> */}
         <div className="e-charts-graph" ref={(t) => this.dom = t} style={{ height: '100%', width: '100%' }} />
       </div>
     )
