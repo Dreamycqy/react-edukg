@@ -1,30 +1,30 @@
 export default [
   {
     path: '/',
-    redirect: '/searchPage',
+    redirect: '/knowledgeWiki/searchPage',
   },
   {
-    path: '/',
+    path: '/knowledgeWiki',
     component: '../layouts',
     routes: [
       {
-        path: 'searchPage',
+        path: './searchPage',
         component: './home/searchPage',
       },
       {
-        path: 'knowledge',
+        path: './knowledge',
         component: './graph/knowledge',
       },
       {
-        path: 'classGraph',
+        path: './classGraph',
         component: './graph/classGraph',
       },
       {
-        path: 'kgPage',
+        path: './kgPage',
         component: './kgPage/index',
       },
       {
-        path: 'collection',
+        path: './collection',
         component: './collection/index',
       },
     ],

@@ -21,7 +21,7 @@ yarn install
 rm -rf public
 mkdir public
 npm run prodTest
-cp ./favicon.ico public/sekg/
-mv public/sekg/index.html server/views/index.html
+cp ./favicon.ico public/knowledgeWiki/
+mv public/knowledgeWiki/index.html server/views/index.html
 
 pm2 startOrReload ${pmJson}

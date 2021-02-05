@@ -1,6 +1,6 @@
 {
   "apps": [{
-    "name": "sekg-pro",
+    "name": "knowledgeWiki-pro",
     "script": "server/www.js",
     "cwd": "",
     "exec_mode": "cluster",

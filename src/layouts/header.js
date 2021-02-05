@@ -78,7 +78,7 @@ class Home extends React.Component {
 
   jumpUserInfo = () => {
     this.props.dispatch(routerRedux.push({
-      pathname: '/userConfig',
+      pathname: '/knowledgeWiki/userConfig',
     }))
   }
 
@@ -129,7 +129,7 @@ class Home extends React.Component {
         >
           <Link to="/">Edukg 基础教育知识图谱</Link>
         </div>
-        {
+        {/* {
           email
             ? (
               <Dropdown overlay={menu}>
@@ -142,7 +142,7 @@ class Home extends React.Component {
               </Dropdown>
             )
             : <a style={{ float: 'right', lineHeight: '40px', marginRight: 20, color: 'white' }} href="javascript:;" onClick={() => this.setState({ visible: true })}>请登录</a>
-        }
+        } */}
         <Modal
           title="欢迎登陆教学平台"
           visible={visible}

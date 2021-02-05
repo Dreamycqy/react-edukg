@@ -28,10 +28,10 @@ export default {
       hardSource: false,
     }],
   ],
-  outputPath: './public/sekg/',
-  publicPath: '/sekg/',
+  outputPath: './public/knowledgeWiki/',
+  publicPath: '/knowledgeWiki/',
   proxy: {
-    '/api/': { target: 'http://127.0.0.1:8345/', changeOrigin: true },
+    '/knowledgeWiki/api/': { target: 'http://127.0.0.1:8345/', changeOrigin: true },
   },
   define: defineProperty(),
   routes: pageRoutes,

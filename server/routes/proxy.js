@@ -17,8 +17,8 @@ router.all('/', (req, res) => {
     url = newPath + url.split('/typeNew/res_lib')[1]
   } else if (url.indexOf('science') > -1) {
     url = newPath + url
-  } else if (url.indexOf('knowledge') > -1) {
-    url = knowledge + url.split('/knowledge')[1]
+  } else if (url.indexOf('knowledgeUri') > -1) {
+    url = knowledge + url.split('/knowledgeUri')[1]
   } else if (url.indexOf('typeAuth') > -1) {
     url = eduPath + '/api' + url.split('/typeAuth')[1]
   } else {
