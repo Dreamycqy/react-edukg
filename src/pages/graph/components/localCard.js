@@ -45,6 +45,8 @@ export default class LocalCard extends React.Component {
         return 'play-circle'
       case 'question':
         return 'read'
+      case 'books':
+        return 'read'
       default:
         return ''
     }
@@ -62,6 +64,8 @@ export default class LocalCard extends React.Component {
         return '教学视频'
       case 'question':
         return '相关习题'
+      case 'books':
+        return '教材出处'
       default:
         return ''
     }

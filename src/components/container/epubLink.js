@@ -10,8 +10,8 @@ export default class SearchPage extends React.Component {
   }
 
   epubimg = (content) => {
-    const { htmlId } = this.props
-    const postUrl = 'http://edukg.cn/epubimg'
+    const { htmlId, searchKey } = this.props
+    const postUrl = 'http://39.100.31.203:8007/epubimg'
     const ExportForm = document.createElement('FORM')
     ExportForm.id = 'form'
     ExportForm.style.display = 'none'
@@ -26,8 +26,13 @@ export default class SearchPage extends React.Component {
     newElement1.setAttribute('name', 'content')
     newElement1.value = content
     newElement1.setAttribute('type', 'hidden')
+    const newElement2 = document.createElement('input')
+    newElement2.setAttribute('name', 'searchKey')
+    newElement2.value = searchKey
+    newElement2.setAttribute('type', 'hidden')
     ExportForm.appendChild(newElement)
     ExportForm.appendChild(newElement1)
+    ExportForm.appendChild(newElement2)
     document.body.appendChild(ExportForm)
     ExportForm.submit()
     ExportForm.remove()

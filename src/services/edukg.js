@@ -32,3 +32,11 @@ export function querygraph(body, rSymbol) {
     rSymbol,
   })
 }
+
+export function search(body, rSymbol) {
+  return request.get({
+    url: '/api/totalsearch',
+    data: body,
+    rSymbol,
+  })
+}

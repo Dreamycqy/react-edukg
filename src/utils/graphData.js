@@ -75,8 +75,9 @@ export const remakeGraphData = (list, forcename) => {
   for (const colle in temp) { // eslint-disable-line
     if (temp[colle].length) {
       temp[colle].forEach((e) => { // eslint-disable-line
+        const name = e.object_label || e.subject_label
         nodes.push({
-          name: e.object_label || e.subject_label,
+          name,
           colle,
           category: colle, // 叶子节点
           symbolSize: 16 + (20 / temp[colle].length), // 节点大小
@@ -108,17 +109,21 @@ export const remakeGraphData = (list, forcename) => {
             },
           },
         })
-        links.push({
-          source: e.object_label || e.subject_label,
-          target: forcename,
-          value: (temp[colle].length),
-          label: {
-            show: true,
-            formatter: () => colle,
-          },
-        })
+        if (!_.find(links, { source: name, colle })) {
+          links.push({
+            source: name,
+            target: forcename,
+            colle,
+            value: (temp[colle].length),
+            label: {
+              show: true,
+              formatter: () => colle,
+            },
+          })
+        }
       })
     }
   }
-  return { nodes, links, treeData }
+  const nodesResult = _.uniqBy(nodes, 'name')
+  return { nodes: nodesResult, links, treeData }
 }

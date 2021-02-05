@@ -14,6 +14,7 @@ import NewCard from './components/localCard'
 import KgTable from './components/kgTable'
 import Gallery from './components/gallery'
 import NewTree from './components/tree'
+import Books from './books'
 import Questions from './question'
 import Styles from './style.less'
 
@@ -127,6 +128,8 @@ class KgContent extends React.Component {
         return '教学视频'
       case 'question':
         return '相关习题'
+      case 'books':
+        return '教材出处'
       default:
         return ''
     }
@@ -248,6 +251,7 @@ class KgContent extends React.Component {
       anchorList.push('picture')
     }
     anchorList.push('question')
+    anchorList.push('books')
     const { transSource, sheetDataFilter, sheetDataHeader } = this.handleConcat(dataSource)
     const dataConfig = {
       title: forcename,
@@ -282,7 +286,10 @@ class KgContent extends React.Component {
                       <Tabs>
                         <TabPane tab="关联知识" key="1" style={{ height: 420 }}>
                           <div style={{ height: '100%', overflow: 'scroll' }}>
-                            <NewTree gData={graph.treeData} handleExpandGraph={this.handleExpandGraph} />
+                            <NewTree
+                              gData={graph.treeData}
+                              handleExpandGraph={this.handleExpandGraph}
+                            />
                           </div>
                         </TabPane>
                       </Tabs>
@@ -320,6 +327,9 @@ class KgContent extends React.Component {
             </NewCard>
             <NewCard show title="question">
               <Questions uri={forcename} />
+            </NewCard>
+            <NewCard show title="books">
+              <Books name={forcename} />
             </NewCard>
           </Spin>
         </div>

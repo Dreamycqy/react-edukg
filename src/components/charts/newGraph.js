@@ -149,13 +149,24 @@ export default class GraphChart extends React.Component {
         },
       }
     } else {
-      const nodes = _.uniqBy(graph.nodes, 'name')
+      const { nodes } = graph
       const categories = []
       nodes.forEach((e) => {
         if (e.colle && !_.find(categories, { name: e.colle })) {
           categories.push({
             name: e.colle,
           })
+        }
+      })
+      graph.links.forEach((e) => {
+        const countList = graph.links.filter((j) => {
+          return j.source === e.source
+        })
+        const count = countList.length
+        const number = _.findIndex(countList, { source: e.source, colle: e.colle })
+        e.lineStyle = {
+          color: 'source',
+          curveness: number / count,
         }
       })
       if (this.props.newClassGraph) {
@@ -228,9 +239,6 @@ export default class GraphChart extends React.Component {
             },
             ...categories,
           ],
-          lineStyle: {
-            color: 'source',
-          },
           emphasis: {
             lineStyle: {
               width: 5,
