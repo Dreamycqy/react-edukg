@@ -16,7 +16,7 @@ export default class BookMasonry extends React.Component {
     } = this.props.data
     return (
       <Card
-        style={{ width: '30%', margin: '1%', borderRadius: 4, boxShadow: '4px 4px 4px', padding: 10 }}
+        style={{ width: '30%', margin: '1%', borderRadius: 4, boxShadow: '4px 4px 4px #00000049', padding: 10 }}
       >
         <Skeleton loading={false} avatar active>
           <h4>

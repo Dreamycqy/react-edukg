@@ -17,16 +17,12 @@ export default class LocalCard extends React.Component {
   handleOutput = () => {
     const option = {}
     if (this.props.dataConfig) {
-      option.fileName = `知识点：${this.props.dataConfig.title}__${moment(new Date()).format('YYYY-MM-DD HH:mm:ss')}`
+      option.fileName = `${this.props.dataConfig.title}_知识卡片_${moment().format('YYYY-MM-DD_HH-mm-ss')}`
       option.datas = [
         {
-        // 父组件传递的要导出的数据
           sheetData: this.props.dataConfig.dataSource,
-          // sheet名字
-          sheetName: 'sheet',
-          // 父组件传递过来的要导出的数据的key值是一个数组
+          sheetName: '知识卡片',
           sheetFilter: this.props.dataConfig.sheetDataFilter,
-          // Excel表格的表头,在父组件中传递的时候注意与key对应
           sheetHeader: this.props.dataConfig.sheetDataHeader,
         },
       ]
@@ -107,8 +103,11 @@ export default class LocalCard extends React.Component {
             >
               <a style={{ marginRight: 20, fontSize: 18 }} href="javascript:;"><Icon type="question-circle" /></a>
             </Popover>
-            <Button onClick={() => this.handleOutput()}>
-              下载
+            <Button style={{ marginRight: 10 }} onClick={() => this.handleOutput()}>
+              下载为表格
+            </Button>
+            <Button onClick={() => this.props.downLoadImg()}>
+              下载为图片
             </Button>
           </div>
         ) : title === 'video' ? (

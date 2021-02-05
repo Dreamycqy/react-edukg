@@ -155,18 +155,24 @@ class KgContent extends React.Component {
   }
 
   handleConcat = (list) => {
-    const transSource = []
-    const sheetDataFilter = ['知识点', '知识内容']
-    const sheetDataHeader = ['知识点', '知识内容']
+    const transSource = [{
+      知识点: '',
+      '': '',
+      知识内容: '',
+    }]
+    const sheetDataFilter = ['知识点', '', '知识内容']
+    const sheetDataHeader = ['知识点', '', '知识内容']
     list.forEach((e) => {
       if (e.labelList) {
         transSource.push({
           知识点: e.predicateLabel,
+          '': '',
           知识内容: e.labelList.filter((j) => { return j.indexOf('http') < 0 }).join(', '),
         })
       } else {
         transSource.push({
           知识点: e.predicateLabel,
+          '': '',
           知识内容: e.object,
         })
       }
@@ -237,6 +243,10 @@ class KgContent extends React.Component {
 
   handleChangeBooksMode = (booksMode) => {
     this.setState({ booksMode })
+  }
+
+  clickDownload = () => {
+    this.myTable.downLoad()
   }
 
   render() {
@@ -312,8 +322,8 @@ class KgContent extends React.Component {
                 )
               }
             </GCard>
-            <NewCard show showExtra dataConfig={dataConfig} title="property">
-              <KgTable dataSource={dataSource} />
+            <NewCard show showExtra dataConfig={dataConfig} title="property" downLoadImg={this.clickDownload}>
+              <KgTable dataSource={dataSource} ref={(e) => this.myTable = e} forcename={forcename} />
             </NewCard>
             <NewCard show title="video">
               <div style={{ height: 300 }}>

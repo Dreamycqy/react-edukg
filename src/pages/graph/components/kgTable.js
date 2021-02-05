@@ -1,5 +1,7 @@
 import React from 'react'
 import { Table } from 'antd'
+import domtoimage from 'dom-to-image'
+import moment from 'moment'
 import Styles from '../style.less'
 
 function checkDiction(text) {
@@ -44,18 +46,32 @@ const columns = [{
 }]
 
 class KgTable extends React.Component {
+  downLoad = () => {
+    domtoimage.toJpeg(this.customTable, { quality: 1 })
+      .then((dataUrl) => {
+        const link = document.createElement('a')
+        link.download = `${this.props.forcename}_知识卡片_${moment().format('YYYY-MM-DD_HH-mm-ss')}.jpg`
+        link.href = dataUrl
+        link.click()
+      })
+  }
+
   render() {
     return (
-      <Table
-        dataSource={this.props.dataSource}
-        columns={columns}
-        size="small"
-        className={Styles.myTable}
-        showHeader={false}
-        pagination={false}
-        scroll={{ y: 450 }}
-        rowKey={(record) => record.propertyname}
-      />
+      <div style={{ overflowY: 'scroll', height: 450 }}>
+        <div ref={(e) => this.customTable = e}>
+          <Table
+            dataSource={this.props.dataSource}
+            columns={columns}
+            size="small"
+            className={Styles.myTable}
+            showHeader={false}
+            pagination={false}
+            style={{ backgroundColor: 'white' }}
+            rowKey={(record) => record.propertyname}
+          />
+        </div>
+      </div>
     )
   }
 }
