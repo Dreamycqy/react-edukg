@@ -5,6 +5,8 @@ import ExportJsonExcel from 'js-export-excel'
 import edulogo from '@/assets/edulogo.png'
 import Styles from '../style.less'
 
+const ButtonGroup = Button.Group
+
 export default class LocalCard extends React.Component {
   constructor(props) {
     super(props)
@@ -80,7 +82,7 @@ export default class LocalCard extends React.Component {
   }
 
   render() {
-    const { value, show, title, showExtra } = this.props
+    const { value, show, title, showExtra, booksMode } = this.props
     return (
       <Card
         className={Styles.myCard}
@@ -113,6 +115,21 @@ export default class LocalCard extends React.Component {
           <a href="javascript:;" onClick={() => window.open('http://edu.10086.cn/cloud/liveClassroom/redirectLive?type=live_Index')}>
             <img src={edulogo} alt="" height="30px" />
           </a>
+        ) : title === 'books' ? (
+          <ButtonGroup style={{ marginRight: 20 }}>
+            <Button
+              type={booksMode === 'masonry' ? 'primary' : 'none'}
+              onClick={() => this.props.handleChangeBooksMode('masonry')}
+            >
+              瀑布流
+            </Button>
+            <Button
+              type={booksMode === 'list' ? 'primary' : 'none'}
+              onClick={() => this.props.handleChangeBooksMode('list')}
+            >
+              列表
+            </Button>
+          </ButtonGroup>
         ) : null}
       >
         {this.renderChildren(value)}

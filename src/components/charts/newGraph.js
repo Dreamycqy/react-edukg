@@ -164,9 +164,10 @@ export default class GraphChart extends React.Component {
         })
         const count = countList.length
         const number = _.findIndex(countList, { source: e.source, colle: e.colle })
+        const evencheck = (number % 2) > 0 ? -1 : 1
         e.lineStyle = {
           color: 'source',
-          curveness: number / count,
+          curveness: evencheck * ((number - evencheck > 0 ? 1 : 0) / count),
         }
       })
       if (this.props.newClassGraph) {

@@ -12,10 +12,6 @@ export default [
         component: './home/searchPage',
       },
       {
-        path: 'newGraph',
-        component: './graph/newGraph',
-      },
-      {
         path: 'knowledge',
         component: './graph/knowledge',
       },

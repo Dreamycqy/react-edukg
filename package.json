@@ -31,6 +31,7 @@
     "react-dom": "^16.8.6",
     "react-highlight-words": "^0.16.0",
     "react-load-script": "0.0.6",
+    "react-masonry-component": "^6.2.1",
     "react-slick": "^0.27.10",
     "slick-carousel": "^1.8.1",
     "uuid": "^3.3.3"

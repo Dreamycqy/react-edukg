@@ -14,13 +14,27 @@ import NewCard from './components/localCard'
 import KgTable from './components/kgTable'
 import Gallery from './components/gallery'
 import NewTree from './components/tree'
-import Books from './books'
+import BooksList from './components/bookList'
+import BooksMasonry from './components/bookMasonry'
 import Questions from './question'
 import Styles from './style.less'
 
 const { Link } = Anchor
 const { TabPane } = Tabs
-const deleteList = ['学术论文', '标注', '出处', '分类编号', '上位分类', '下位分类', '科普中国资源', '科普活动资源服务平台-科普资源', '科普活动资源服务平台-活动资源', '科学百科词条', '中国科普博览', '类型']
+const deleteList = [
+  '学术论文',
+  '标注',
+  '出处',
+  '分类编号',
+  '上位分类',
+  '下位分类',
+  '科普中国资源',
+  '科普活动资源服务平台-科普资源',
+  '科普活动资源服务平台-活动资源',
+  '科学百科词条',
+  '中国科普博览',
+  '类型',
+]
 
 class KgContent extends React.Component {
   constructor(props) {
@@ -39,6 +53,7 @@ class KgContent extends React.Component {
       selectChart: 'relation',
       liveClassRoom: '',
       classRoomInfo: {},
+      booksMode: 'masonry',
     }
   }
 
@@ -209,27 +224,6 @@ class KgContent extends React.Component {
         </div>,
       )
     })
-    console.log(graph.treeData)
-    // for (const i in graph.tableResult) { // eslint-disable-line
-    //   _.uniqBy(graph.tableResult[i], 'subject_label').forEach((e) => {
-    //     if (result.length <= 20) {
-    //       result.push(
-    //         <div style={{ padding: 6 }}>
-    //           <a
-    //             href="javascript:;" style={{ margin: 10, color: '#24b0e6' }}
-    //             onClick={() => this.handleExpandGraph({
-    //               name: e.subject_label,
-    //               uri: e.subject,
-    //             })}
-    //           >
-    //             <Icon theme="filled" type="right-circle" style={{ marginRight: 10 }} />
-    //             {e.subject_label}
-    //           </a>
-    //         </div>,
-    //       )
-    //     }
-    //   })
-    // }
     return result
   }
 
@@ -241,10 +235,14 @@ class KgContent extends React.Component {
     return result
   }
 
+  handleChangeBooksMode = (booksMode) => {
+    this.setState({ booksMode })
+  }
+
   render() {
     const anchorList = ['graph', 'property', 'video']
     const {
-      forcename, loading, graph, dataSource, imgList,
+      forcename, loading, graph, dataSource, imgList, booksMode,
       subject, thinkData, selectChart, liveClassRoom, classRoomInfo,
     } = this.state
     if (imgList.length > 0) {
@@ -328,8 +326,8 @@ class KgContent extends React.Component {
             <NewCard show title="question">
               <Questions uri={forcename} />
             </NewCard>
-            <NewCard show title="books">
-              <Books name={forcename} />
+            <NewCard show title="books" booksMode={booksMode} handleChangeBooksMode={this.handleChangeBooksMode}>
+              {booksMode === 'list' ? <BooksList name={forcename} /> : <BooksMasonry name={forcename} />}
             </NewCard>
           </Spin>
         </div>
