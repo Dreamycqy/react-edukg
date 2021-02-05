@@ -323,7 +323,11 @@ class KgContent extends React.Component {
               }
             </GCard>
             <NewCard show showExtra dataConfig={dataConfig} title="property" downLoadImg={this.clickDownload}>
-              <KgTable dataSource={dataSource} ref={(e) => this.myTable = e} forcename={forcename} />
+              <KgTable
+                dataSource={dataSource}
+                ref={(e) => this.myTable = e}
+                forcename={forcename}
+              />
             </NewCard>
             <NewCard show title="video">
               <div style={{ height: 300 }}>
