@@ -3,7 +3,7 @@ const express = require('express')
 const config = {
   dev: {
     env: 'development',
-    port: '8345',
+    port: '8848',
     basePath: 'http://39.100.31.203:8007',
     newPath: 'http://39.100.31.203:8080/res_lib',
     knowledge: 'http://39.100.31.203:8001/api',
@@ -11,7 +11,7 @@ const config = {
   },
   test: {
     env: 'test',
-    port: '8345',
+    port: '8848',
     basePath: 'http://39.100.31.203:8007',
     newPath: 'http://39.100.31.203:8080/res_lib',
     knowledge: 'http://39.100.31.203:8001/api',
@@ -19,7 +19,7 @@ const config = {
   },
   production: {
     env: 'production',
-    port: '8345',
+    port: '8848',
     basePath: 'http://39.100.31.203:8007',
     newPath: 'http://39.100.31.203:8080/res_lib',
     knowledge: 'http://39.100.31.203:8001/api',

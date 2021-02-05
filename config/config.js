@@ -31,7 +31,7 @@ export default {
   outputPath: './public/knowledgeWiki/',
   publicPath: '/knowledgeWiki/',
   proxy: {
-    '/knowledgeWiki/api/': { target: 'http://127.0.0.1:8345/', changeOrigin: true },
+    '/knowledgeWiki/api/': { target: 'http://127.0.0.1:8848/', changeOrigin: true },
   },
   define: defineProperty(),
   routes: pageRoutes,
